@@ -16,9 +16,6 @@ EXPORTS
     plot3d_colorizer_factory_get
     plot3d_colorizer_factory_deinit
     plot3d_colormap_get_color
-    plot3d_grid_func_t
-    plot3d_curve_func_t
-    plot3d_color_func_t
     plot3d_colorizer_expr_register
     plot3d_create
     plot3d_cast

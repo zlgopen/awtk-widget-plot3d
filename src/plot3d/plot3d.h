@@ -30,42 +30,21 @@
 BEGIN_C_DECLS
 
 /**
- * @method plot3d_grid_func_t
  * 网格采样函数：给定 x/y 返回 z，相当于 matlab 里 surf 用的 z=f(x,y)。
- * @param {void*} ctx 回调上下文。
- * @param {float_t} x x坐标。
- * @param {float_t} y y坐标。
- * @param {float_t*} z 返回z坐标。
- *
- * @return {ret_t} 返回RET_OK表示成功，否则该点被丢弃。
+ * 返回 RET_OK 表示成功，否则该点被丢弃。
+ * （函数指针类型，不可使用 @method，否则会进入 DLL 导出表。）
  */
 typedef ret_t (*plot3d_grid_func_t)(void* ctx, float_t x, float_t y, float_t* z);
 
 /**
- * @method plot3d_curve_func_t
- * 参数曲线的采样函数：由参数t算出一个点的坐标。
- *
- * @param {void*} ctx 回调上下文。
- * @param {float_t} t 曲线参数。
- * @param {float_t*} x 返回x坐标。
- * @param {float_t*} y 返回y坐标。
- * @param {float_t*} z 返回z坐标。
- *
- * @return {ret_t} 返回RET_OK表示成功，否则该点被丢弃。
+ * 参数曲线的采样函数：由参数 t 算出一个点的坐标。
+ * 返回 RET_OK 表示成功，否则该点被丢弃。
  */
 typedef ret_t (*plot3d_curve_func_t)(void* ctx, float_t t, float_t* x, float_t* y, float_t* z);
 
 /**
- * @method plot3d_color_func_t
  * 采样点的配色函数：由点的坐标算出颜色，用来取代默认的配色表。
- *
- * @param {void*} ctx 回调上下文。
- * @param {float_t} x x坐标。
- * @param {float_t} y y坐标。
- * @param {float_t} z z坐标。
- * @param {color_t*} color 返回颜色。
- *
- * @return {ret_t} 返回RET_OK表示成功，否则该点用配色表取色。
+ * 返回 RET_OK 表示成功，否则该点用配色表取色。
  */
 typedef ret_t (*plot3d_color_func_t)(void* ctx, float_t x, float_t y, float_t z, color_t* color);
 
