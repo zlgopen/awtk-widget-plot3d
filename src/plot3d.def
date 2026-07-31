@@ -17,6 +17,13 @@ EXPORTS
     plot3d_colorizer_factory_deinit
     plot3d_colormap_get_color
     plot3d_colorizer_expr_register
+    plot3d_datatip_pick_nearest
+    plot3d_datatip_update_hover
+    plot3d_datatip_clear_hover
+    plot3d_datatip_sanitize_hover
+    plot3d_datatip_compute_label_pos
+    plot3d_calc_bounds
+    plot3d_update_projection_cache
     plot3d_create
     plot3d_cast
     plot3d_set_dataset
@@ -78,6 +85,21 @@ EXPORTS
     plot3d_set_x_grid_count
     plot3d_set_y_grid_count
     plot3d_set_z_grid_count
+    plot3d_pick_axis_text_normal
+    plot3d_calc_axis_scales
+    plot3d_calc_nice_axis
+    plot3d_build_axis_color_segments
+    plot3d_pick_axis_text_edge
+    plot3d_calc_axis_tick_offset
+    plot3d_calc_axis_name_offset
+    plot3d_calc_axis_tick_stride
+    plot3d_calc_axis_tick_range
+    plot3d_set_prop_for_test
+    plot3d_get_prop_for_test
+    plot3d_get_source_nr_for_test
+    plot3d_get_colorizer_nr_for_test
+    plot3d_get_type_nr_for_test
+    plot3d_get_resample_nr_for_test
     plot3d_source_result_init
     plot3d_source_sample
     plot3d_source_set_prop

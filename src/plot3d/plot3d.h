@@ -1183,36 +1183,223 @@ typedef struct _plot3d_axis_text_edge_t {
   float_t z1;
 } plot3d_axis_text_edge_t;
 
+/**
+ * @method plot3d_pick_axis_text_normal
+ * 选择轴文字法线方向（屏幕空间）。
+ * @annotation ["global"]
+ * @param {float_t} dx 轴方向 x。
+ * @param {float_t} dy 轴方向 y。
+ * @param {float_t} sx 参考点屏幕 x。
+ * @param {float_t} sy 参考点屏幕 y。
+ * @param {float_t} cx 中心屏幕 x。
+ * @param {float_t} cy 中心屏幕 y。
+ * @param {float_t*} out_nx 返回法线 x。
+ * @param {float_t*} out_ny 返回法线 y。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
 ret_t plot3d_pick_axis_text_normal(float_t dx, float_t dy, float_t sx, float_t sy, float_t cx,
                                     float_t cy, float_t* out_nx, float_t* out_ny);
+
+/**
+ * @method plot3d_calc_axis_scales
+ * 计算三轴缩放。
+ * @annotation ["global"]
+ * @param {bool_t} equal_axis 是否等轴。
+ * @param {float_t} extent_x X 轴范围。
+ * @param {float_t} extent_y Y 轴范围。
+ * @param {float_t} extent_z Z 轴范围。
+ * @param {float_t} aspect_x X 轴纵横比。
+ * @param {float_t} aspect_y Y 轴纵横比。
+ * @param {float_t} aspect_z Z 轴纵横比。
+ * @param {float_t*} out_scale_x 返回 X 缩放。
+ * @param {float_t*} out_scale_y 返回 Y 缩放。
+ * @param {float_t*} out_scale_z 返回 Z 缩放。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
 ret_t plot3d_calc_axis_scales(bool_t equal_axis, float_t extent_x, float_t extent_y,
                                float_t extent_z, float_t aspect_x, float_t aspect_y,
                                float_t aspect_z, float_t* out_scale_x, float_t* out_scale_y,
                                float_t* out_scale_z);
+
+/**
+ * @method plot3d_calc_nice_axis
+ * 计算美观的坐标轴刻度范围。
+ * @annotation ["global"]
+ * @param {float_t} min_v 最小值。
+ * @param {float_t} max_v 最大值。
+ * @param {uint32_t} max_count 最大刻度数。
+ * @param {float_t*} out_min 返回最小值。
+ * @param {float_t*} out_max 返回最大值。
+ * @param {uint32_t*} out_count 返回刻度数。
+ * @param {uint32_t*} out_decimals 返回小数位数。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
 ret_t plot3d_calc_nice_axis(float_t min_v, float_t max_v, uint32_t max_count, float_t* out_min,
                              float_t* out_max, uint32_t* out_count, uint32_t* out_decimals);
+
+/**
+ * @method plot3d_build_axis_color_segments
+ * 构建轴正负区间的颜色分段。
+ * @annotation ["global"]
+ * @param {float_t} min_v 最小值。
+ * @param {float_t} max_v 最大值。
+ * @param {color_t} positive_color 正半轴颜色。
+ * @param {float_t} brightness 负半轴相对亮度。
+ * @param {plot3d_axis_color_segment_t*} out 返回至多 2 段颜色。
+ *
+ * @return {uint32_t} 返回分段数量。
+ */
 uint32_t plot3d_build_axis_color_segments(float_t min_v, float_t max_v, color_t positive_color,
                                            float_t brightness, plot3d_axis_color_segment_t out[2]);
+
+/**
+ * @method plot3d_pick_axis_text_edge
+ * 选择轴文字所在的边界边。
+ * @annotation ["global"]
+ * @param {plot3d_axis_t} axis 轴。
+ * @param {float_t} camera_yaw 相机偏航角。
+ * @param {float_t} min_x 包围盒最小 x。
+ * @param {float_t} max_x 包围盒最大 x。
+ * @param {float_t} min_y 包围盒最小 y。
+ * @param {float_t} max_y 包围盒最大 y。
+ * @param {float_t} min_z 包围盒最小 z。
+ * @param {float_t} max_z 包围盒最大 z。
+ * @param {plot3d_axis_text_edge_t*} out 返回边。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
 ret_t plot3d_pick_axis_text_edge(plot3d_axis_t axis, float_t camera_yaw, float_t min_x,
                                   float_t max_x, float_t min_y, float_t max_y, float_t min_z,
                                   float_t max_z, plot3d_axis_text_edge_t* out);
+
+/**
+ * @method plot3d_calc_axis_tick_offset
+ * 计算刻度文字相对轴线的偏移。
+ * @annotation ["global"]
+ * @param {float_t} font_size 字号。
+ * @param {float_t} nx 法线 x。
+ * @param {float_t} ny 法线 y。
+ * @param {float_t} text_w 文字宽度。
+ * @param {float_t*} out_offset 返回偏移。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
 ret_t plot3d_calc_axis_tick_offset(float_t font_size, float_t nx, float_t ny, float_t text_w,
                                     float_t* out_offset);
+
+/**
+ * @method plot3d_calc_axis_name_offset
+ * 计算轴名相对轴线的偏移。
+ * @annotation ["global"]
+ * @param {float_t} font_size 字号。
+ * @param {float_t} nx 法线 x。
+ * @param {float_t} ny 法线 y。
+ * @param {float_t} tick_text_w 刻度文字宽度。
+ * @param {float_t} name_text_w 轴名宽度。
+ * @param {float_t*} out_offset 返回偏移。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
 ret_t plot3d_calc_axis_name_offset(float_t font_size, float_t nx, float_t ny, float_t tick_text_w,
                                     float_t name_text_w, float_t* out_offset);
+
+/**
+ * @method plot3d_calc_axis_tick_stride
+ * 计算刻度抽样步长，避免文字重叠。
+ * @annotation ["global"]
+ * @param {float_t} edge_len 边长度。
+ * @param {uint32_t} count 刻度数。
+ * @param {float_t} ux 边方向 x。
+ * @param {float_t} uy 边方向 y。
+ * @param {float_t} text_w 文字宽度。
+ * @param {float_t} font_size 字号。
+ * @param {uint32_t*} out_stride 返回步长。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
 ret_t plot3d_calc_axis_tick_stride(float_t edge_len, uint32_t count, float_t ux, float_t uy,
                                     float_t text_w, float_t font_size, uint32_t* out_stride);
+
+/**
+ * @method plot3d_calc_axis_tick_range
+ * 计算刻度绘制起止索引。
+ * @annotation ["global"]
+ * @param {plot3d_axis_t} axis 轴。
+ * @param {float_t} camera_yaw 相机偏航角。
+ * @param {uint32_t} count 刻度数。
+ * @param {uint32_t*} out_begin 返回起始索引。
+ * @param {uint32_t*} out_end 返回结束索引。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
 ret_t plot3d_calc_axis_tick_range(plot3d_axis_t axis, float_t camera_yaw, uint32_t count,
                                    uint32_t* out_begin, uint32_t* out_end);
 
-/*for test*/
-/* widget_set_prop 在 vtable 返回 RET_NOT_FOUND 时会把值写进 custom_props 并返回 RET_OK，
- * 这个兜底会把「插件没认领该属性」伪装成成功，所以测试只能直连 vtable 里的 static 函数。 */
+/**
+ * @method plot3d_set_prop_for_test
+ * 直连 vtable 的 set_prop（供单元测试绕过 custom_props 兜底）。
+ * @annotation ["global"]
+ * @param {widget_t*} widget widget对象。
+ * @param {const char*} name 属性名。
+ * @param {const value_t*} v 属性值。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
 ret_t plot3d_set_prop_for_test(widget_t* widget, const char* name, const value_t* v);
+
+/**
+ * @method plot3d_get_prop_for_test
+ * 直连 vtable 的 get_prop（供单元测试）。
+ * @annotation ["global"]
+ * @param {widget_t*} widget widget对象。
+ * @param {const char*} name 属性名。
+ * @param {value_t*} v 返回属性值。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
 ret_t plot3d_get_prop_for_test(widget_t* widget, const char* name, value_t* v);
+
+/**
+ * @method plot3d_get_source_nr_for_test
+ * 获取已创建的数据源插件实例数（供单元测试）。
+ * @annotation ["global"]
+ * @param {widget_t*} widget widget对象。
+ *
+ * @return {uint32_t} 返回实例数。
+ */
 uint32_t plot3d_get_source_nr_for_test(widget_t* widget);
+
+/**
+ * @method plot3d_get_colorizer_nr_for_test
+ * 获取已创建的配色插件实例数（供单元测试）。
+ * @annotation ["global"]
+ * @param {widget_t*} widget widget对象。
+ *
+ * @return {uint32_t} 返回实例数。
+ */
 uint32_t plot3d_get_colorizer_nr_for_test(widget_t* widget);
+
+/**
+ * @method plot3d_get_type_nr_for_test
+ * 获取已创建的图型插件实例数（供单元测试）。
+ * @annotation ["global"]
+ * @param {widget_t*} widget widget对象。
+ *
+ * @return {uint32_t} 返回实例数。
+ */
 uint32_t plot3d_get_type_nr_for_test(widget_t* widget);
+
+/**
+ * @method plot3d_get_resample_nr_for_test
+ * 获取重采样次数（供单元测试）。
+ * @annotation ["global"]
+ * @param {widget_t*} widget widget对象。
+ *
+ * @return {uint32_t} 返回重采样次数。
+ */
 uint32_t plot3d_get_resample_nr_for_test(widget_t* widget);
 
 #define PLOT3D_PROP_DATASET "dataset"

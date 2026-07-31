@@ -65,10 +65,32 @@ typedef struct _plot3d_axis_range_t {
 ret_t plot3d_bounds_get_axis(const plot3d_bounds_t* bounds, plot3d_axis_t axis,
                               plot3d_axis_range_t* out);
 float_t plot3d_axis_tick_value(const plot3d_axis_range_t* range, uint32_t index);
+
+/**
+ * @method plot3d_calc_bounds
+ * 计算数据包围盒与轴刻度范围。
+ * @annotation ["global"]
+ * @param {plot3d_t*} plot3d plot3d对象。
+ * @param {plot3d_bounds_t*} bounds 返回包围盒。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
 ret_t plot3d_calc_bounds(plot3d_t* plot3d, plot3d_bounds_t* bounds);
+
 bool_t plot3d_project_world_point(widget_t* widget, const plot3d_bounds_t* bounds, float_t x,
                                    float_t y, float_t z, plot3d_projected_point_t* out);
+
+/**
+ * @method plot3d_update_projection_cache
+ * 重建投影缓存，并清理越界 hover。
+ * @annotation ["global"]
+ * @param {widget_t*} widget widget对象。
+ * @param {const plot3d_bounds_t*} bounds 包围盒。
+ *
+ * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
+ */
 ret_t plot3d_update_projection_cache(widget_t* widget, const plot3d_bounds_t* bounds);
+
 int plot3d_primitive_compare(const void* a, const void* b);
 
 END_C_DECLS

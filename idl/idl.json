@@ -321,6 +321,238 @@
     "level": 1
   },
   {
+    "params": [
+      {
+        "type": "const plot3d_projected_point_t*",
+        "name": "points",
+        "desc": "投影点数组。"
+      },
+      {
+        "type": "uint32_t",
+        "name": "points_nr",
+        "desc": "点数。"
+      },
+      {
+        "type": "float_t",
+        "name": "screen_x",
+        "desc": "屏幕 x。"
+      },
+      {
+        "type": "float_t",
+        "name": "screen_y",
+        "desc": "屏幕 y。"
+      },
+      {
+        "type": "float_t",
+        "name": "threshold_px",
+        "desc": "命中阈值（像素）。"
+      }
+    ],
+    "annotation": {
+      "global": true
+    },
+    "desc": "在投影点中选取距屏幕坐标最近且在阈值内的点。",
+    "name": "plot3d_datatip_pick_nearest",
+    "return": {
+      "type": "int32_t",
+      "desc": "返回最近点索引，未命中返回 -1。"
+    },
+    "type": "method",
+    "header": "plot3d/plot3d_datatip.h",
+    "level": 1
+  },
+  {
+    "params": [
+      {
+        "type": "widget_t*",
+        "name": "widget",
+        "desc": "widget对象。"
+      },
+      {
+        "type": "float_t",
+        "name": "screen_x",
+        "desc": "屏幕 x。"
+      },
+      {
+        "type": "float_t",
+        "name": "screen_y",
+        "desc": "屏幕 y。"
+      }
+    ],
+    "annotation": {
+      "global": true
+    },
+    "desc": "根据屏幕坐标更新 hover 点。",
+    "name": "plot3d_datatip_update_hover",
+    "return": {
+      "type": "ret_t",
+      "desc": "返回RET_OK表示成功，否则表示失败。"
+    },
+    "type": "method",
+    "header": "plot3d/plot3d_datatip.h",
+    "level": 1
+  },
+  {
+    "params": [
+      {
+        "type": "widget_t*",
+        "name": "widget",
+        "desc": "widget对象。"
+      }
+    ],
+    "annotation": {
+      "global": true
+    },
+    "desc": "清除 hover 状态。",
+    "name": "plot3d_datatip_clear_hover",
+    "return": {
+      "type": "void",
+      "desc": "返回无。"
+    },
+    "type": "method",
+    "header": "plot3d/plot3d_datatip.h",
+    "level": 1
+  },
+  {
+    "params": [
+      {
+        "type": "widget_t*",
+        "name": "widget",
+        "desc": "widget对象。"
+      }
+    ],
+    "annotation": {
+      "global": true
+    },
+    "desc": "校验并清理无效的 hover 索引。",
+    "name": "plot3d_datatip_sanitize_hover",
+    "return": {
+      "type": "void",
+      "desc": "返回无。"
+    },
+    "type": "method",
+    "header": "plot3d/plot3d_datatip.h",
+    "level": 1
+  },
+  {
+    "params": [
+      {
+        "type": "float_t",
+        "name": "marker_sx",
+        "desc": "标记点屏幕 x。"
+      },
+      {
+        "type": "float_t",
+        "name": "marker_sy",
+        "desc": "标记点屏幕 y。"
+      },
+      {
+        "type": "float_t",
+        "name": "box_w",
+        "desc": "标签框宽。"
+      },
+      {
+        "type": "float_t",
+        "name": "box_h",
+        "desc": "标签框高。"
+      },
+      {
+        "type": "float_t",
+        "name": "clip_l",
+        "desc": "裁剪左。"
+      },
+      {
+        "type": "float_t",
+        "name": "clip_t",
+        "desc": "裁剪上。"
+      },
+      {
+        "type": "float_t",
+        "name": "clip_r",
+        "desc": "裁剪右。"
+      },
+      {
+        "type": "float_t",
+        "name": "clip_b",
+        "desc": "裁剪下。"
+      },
+      {
+        "type": "float_t*",
+        "name": "out_x",
+        "desc": "返回标签左上角 x。"
+      },
+      {
+        "type": "float_t*",
+        "name": "out_y",
+        "desc": "返回标签左上角 y。"
+      }
+    ],
+    "annotation": {
+      "global": true
+    },
+    "desc": "计算 datatip 标签框位置，尽量不越出裁剪矩形。",
+    "name": "plot3d_datatip_compute_label_pos",
+    "return": {
+      "type": "void",
+      "desc": "返回无。"
+    },
+    "type": "method",
+    "header": "plot3d/plot3d_datatip.h",
+    "level": 1
+  },
+  {
+    "params": [
+      {
+        "type": "plot3d_t*",
+        "name": "plot3d",
+        "desc": "plot3d对象。"
+      },
+      {
+        "type": "plot3d_bounds_t*",
+        "name": "bounds",
+        "desc": "返回包围盒。"
+      }
+    ],
+    "annotation": {
+      "global": true
+    },
+    "desc": "计算数据包围盒与轴刻度范围。",
+    "name": "plot3d_calc_bounds",
+    "return": {
+      "type": "ret_t",
+      "desc": "返回RET_OK表示成功，否则表示失败。"
+    },
+    "type": "method",
+    "header": "plot3d/plot3d_scene.h",
+    "level": 1
+  },
+  {
+    "params": [
+      {
+        "type": "widget_t*",
+        "name": "widget",
+        "desc": "widget对象。"
+      },
+      {
+        "type": "const plot3d_bounds_t*",
+        "name": "bounds",
+        "desc": "包围盒。"
+      }
+    ],
+    "annotation": {
+      "global": true
+    },
+    "desc": "重建投影缓存，并清理越界 hover。",
+    "name": "plot3d_update_projection_cache",
+    "return": {
+      "type": "ret_t",
+      "desc": "返回RET_OK表示成功，否则表示失败。"
+    },
+    "type": "method",
+    "header": "plot3d/plot3d_scene.h",
+    "level": 1
+  },
+  {
     "type": "class",
     "methods": [],
     "events": [],
@@ -1917,6 +2149,606 @@
     "header": "plot3d/plot3d.h",
     "desc": "一个采样点的位置，与 plot3d_color_value_t 一起构成配色求值的入参与出参。",
     "name": "plot3d_sample_pos_t",
+    "level": 1
+  },
+  {
+    "params": [
+      {
+        "type": "float_t",
+        "name": "dx",
+        "desc": "轴方向 x。"
+      },
+      {
+        "type": "float_t",
+        "name": "dy",
+        "desc": "轴方向 y。"
+      },
+      {
+        "type": "float_t",
+        "name": "sx",
+        "desc": "参考点屏幕 x。"
+      },
+      {
+        "type": "float_t",
+        "name": "sy",
+        "desc": "参考点屏幕 y。"
+      },
+      {
+        "type": "float_t",
+        "name": "cx",
+        "desc": "中心屏幕 x。"
+      },
+      {
+        "type": "float_t",
+        "name": "cy",
+        "desc": "中心屏幕 y。"
+      },
+      {
+        "type": "float_t*",
+        "name": "out_nx",
+        "desc": "返回法线 x。"
+      },
+      {
+        "type": "float_t*",
+        "name": "out_ny",
+        "desc": "返回法线 y。"
+      }
+    ],
+    "annotation": {
+      "global": true
+    },
+    "desc": "选择轴文字法线方向（屏幕空间）。",
+    "name": "plot3d_pick_axis_text_normal",
+    "return": {
+      "type": "ret_t",
+      "desc": "返回RET_OK表示成功，否则表示失败。"
+    },
+    "type": "method",
+    "header": "plot3d/plot3d.h",
+    "level": 1
+  },
+  {
+    "params": [
+      {
+        "type": "bool_t",
+        "name": "equal_axis",
+        "desc": "是否等轴。"
+      },
+      {
+        "type": "float_t",
+        "name": "extent_x",
+        "desc": "X 轴范围。"
+      },
+      {
+        "type": "float_t",
+        "name": "extent_y",
+        "desc": "Y 轴范围。"
+      },
+      {
+        "type": "float_t",
+        "name": "extent_z",
+        "desc": "Z 轴范围。"
+      },
+      {
+        "type": "float_t",
+        "name": "aspect_x",
+        "desc": "X 轴纵横比。"
+      },
+      {
+        "type": "float_t",
+        "name": "aspect_y",
+        "desc": "Y 轴纵横比。"
+      },
+      {
+        "type": "float_t",
+        "name": "aspect_z",
+        "desc": "Z 轴纵横比。"
+      },
+      {
+        "type": "float_t*",
+        "name": "out_scale_x",
+        "desc": "返回 X 缩放。"
+      },
+      {
+        "type": "float_t*",
+        "name": "out_scale_y",
+        "desc": "返回 Y 缩放。"
+      },
+      {
+        "type": "float_t*",
+        "name": "out_scale_z",
+        "desc": "返回 Z 缩放。"
+      }
+    ],
+    "annotation": {
+      "global": true
+    },
+    "desc": "计算三轴缩放。",
+    "name": "plot3d_calc_axis_scales",
+    "return": {
+      "type": "ret_t",
+      "desc": "返回RET_OK表示成功，否则表示失败。"
+    },
+    "type": "method",
+    "header": "plot3d/plot3d.h",
+    "level": 1
+  },
+  {
+    "params": [
+      {
+        "type": "float_t",
+        "name": "min_v",
+        "desc": "最小值。"
+      },
+      {
+        "type": "float_t",
+        "name": "max_v",
+        "desc": "最大值。"
+      },
+      {
+        "type": "uint32_t",
+        "name": "max_count",
+        "desc": "最大刻度数。"
+      },
+      {
+        "type": "float_t*",
+        "name": "out_min",
+        "desc": "返回最小值。"
+      },
+      {
+        "type": "float_t*",
+        "name": "out_max",
+        "desc": "返回最大值。"
+      },
+      {
+        "type": "uint32_t*",
+        "name": "out_count",
+        "desc": "返回刻度数。"
+      },
+      {
+        "type": "uint32_t*",
+        "name": "out_decimals",
+        "desc": "返回小数位数。"
+      }
+    ],
+    "annotation": {
+      "global": true
+    },
+    "desc": "计算美观的坐标轴刻度范围。",
+    "name": "plot3d_calc_nice_axis",
+    "return": {
+      "type": "ret_t",
+      "desc": "返回RET_OK表示成功，否则表示失败。"
+    },
+    "type": "method",
+    "header": "plot3d/plot3d.h",
+    "level": 1
+  },
+  {
+    "params": [
+      {
+        "type": "float_t",
+        "name": "min_v",
+        "desc": "最小值。"
+      },
+      {
+        "type": "float_t",
+        "name": "max_v",
+        "desc": "最大值。"
+      },
+      {
+        "type": "color_t",
+        "name": "positive_color",
+        "desc": "正半轴颜色。"
+      },
+      {
+        "type": "float_t",
+        "name": "brightness",
+        "desc": "负半轴相对亮度。"
+      },
+      {
+        "type": "plot3d_axis_color_segment_t*",
+        "name": "out",
+        "desc": "返回至多 2 段颜色。"
+      }
+    ],
+    "annotation": {
+      "global": true
+    },
+    "desc": "构建轴正负区间的颜色分段。",
+    "name": "plot3d_build_axis_color_segments",
+    "return": {
+      "type": "uint32_t",
+      "desc": "返回分段数量。"
+    },
+    "type": "method",
+    "header": "plot3d/plot3d.h",
+    "level": 1
+  },
+  {
+    "params": [
+      {
+        "type": "plot3d_axis_t",
+        "name": "axis",
+        "desc": "轴。"
+      },
+      {
+        "type": "float_t",
+        "name": "camera_yaw",
+        "desc": "相机偏航角。"
+      },
+      {
+        "type": "float_t",
+        "name": "min_x",
+        "desc": "包围盒最小 x。"
+      },
+      {
+        "type": "float_t",
+        "name": "max_x",
+        "desc": "包围盒最大 x。"
+      },
+      {
+        "type": "float_t",
+        "name": "min_y",
+        "desc": "包围盒最小 y。"
+      },
+      {
+        "type": "float_t",
+        "name": "max_y",
+        "desc": "包围盒最大 y。"
+      },
+      {
+        "type": "float_t",
+        "name": "min_z",
+        "desc": "包围盒最小 z。"
+      },
+      {
+        "type": "float_t",
+        "name": "max_z",
+        "desc": "包围盒最大 z。"
+      },
+      {
+        "type": "plot3d_axis_text_edge_t*",
+        "name": "out",
+        "desc": "返回边。"
+      }
+    ],
+    "annotation": {
+      "global": true
+    },
+    "desc": "选择轴文字所在的边界边。",
+    "name": "plot3d_pick_axis_text_edge",
+    "return": {
+      "type": "ret_t",
+      "desc": "返回RET_OK表示成功，否则表示失败。"
+    },
+    "type": "method",
+    "header": "plot3d/plot3d.h",
+    "level": 1
+  },
+  {
+    "params": [
+      {
+        "type": "float_t",
+        "name": "font_size",
+        "desc": "字号。"
+      },
+      {
+        "type": "float_t",
+        "name": "nx",
+        "desc": "法线 x。"
+      },
+      {
+        "type": "float_t",
+        "name": "ny",
+        "desc": "法线 y。"
+      },
+      {
+        "type": "float_t",
+        "name": "text_w",
+        "desc": "文字宽度。"
+      },
+      {
+        "type": "float_t*",
+        "name": "out_offset",
+        "desc": "返回偏移。"
+      }
+    ],
+    "annotation": {
+      "global": true
+    },
+    "desc": "计算刻度文字相对轴线的偏移。",
+    "name": "plot3d_calc_axis_tick_offset",
+    "return": {
+      "type": "ret_t",
+      "desc": "返回RET_OK表示成功，否则表示失败。"
+    },
+    "type": "method",
+    "header": "plot3d/plot3d.h",
+    "level": 1
+  },
+  {
+    "params": [
+      {
+        "type": "float_t",
+        "name": "font_size",
+        "desc": "字号。"
+      },
+      {
+        "type": "float_t",
+        "name": "nx",
+        "desc": "法线 x。"
+      },
+      {
+        "type": "float_t",
+        "name": "ny",
+        "desc": "法线 y。"
+      },
+      {
+        "type": "float_t",
+        "name": "tick_text_w",
+        "desc": "刻度文字宽度。"
+      },
+      {
+        "type": "float_t",
+        "name": "name_text_w",
+        "desc": "轴名宽度。"
+      },
+      {
+        "type": "float_t*",
+        "name": "out_offset",
+        "desc": "返回偏移。"
+      }
+    ],
+    "annotation": {
+      "global": true
+    },
+    "desc": "计算轴名相对轴线的偏移。",
+    "name": "plot3d_calc_axis_name_offset",
+    "return": {
+      "type": "ret_t",
+      "desc": "返回RET_OK表示成功，否则表示失败。"
+    },
+    "type": "method",
+    "header": "plot3d/plot3d.h",
+    "level": 1
+  },
+  {
+    "params": [
+      {
+        "type": "float_t",
+        "name": "edge_len",
+        "desc": "边长度。"
+      },
+      {
+        "type": "uint32_t",
+        "name": "count",
+        "desc": "刻度数。"
+      },
+      {
+        "type": "float_t",
+        "name": "ux",
+        "desc": "边方向 x。"
+      },
+      {
+        "type": "float_t",
+        "name": "uy",
+        "desc": "边方向 y。"
+      },
+      {
+        "type": "float_t",
+        "name": "text_w",
+        "desc": "文字宽度。"
+      },
+      {
+        "type": "float_t",
+        "name": "font_size",
+        "desc": "字号。"
+      },
+      {
+        "type": "uint32_t*",
+        "name": "out_stride",
+        "desc": "返回步长。"
+      }
+    ],
+    "annotation": {
+      "global": true
+    },
+    "desc": "计算刻度抽样步长，避免文字重叠。",
+    "name": "plot3d_calc_axis_tick_stride",
+    "return": {
+      "type": "ret_t",
+      "desc": "返回RET_OK表示成功，否则表示失败。"
+    },
+    "type": "method",
+    "header": "plot3d/plot3d.h",
+    "level": 1
+  },
+  {
+    "params": [
+      {
+        "type": "plot3d_axis_t",
+        "name": "axis",
+        "desc": "轴。"
+      },
+      {
+        "type": "float_t",
+        "name": "camera_yaw",
+        "desc": "相机偏航角。"
+      },
+      {
+        "type": "uint32_t",
+        "name": "count",
+        "desc": "刻度数。"
+      },
+      {
+        "type": "uint32_t*",
+        "name": "out_begin",
+        "desc": "返回起始索引。"
+      },
+      {
+        "type": "uint32_t*",
+        "name": "out_end",
+        "desc": "返回结束索引。"
+      }
+    ],
+    "annotation": {
+      "global": true
+    },
+    "desc": "计算刻度绘制起止索引。",
+    "name": "plot3d_calc_axis_tick_range",
+    "return": {
+      "type": "ret_t",
+      "desc": "返回RET_OK表示成功，否则表示失败。"
+    },
+    "type": "method",
+    "header": "plot3d/plot3d.h",
+    "level": 1
+  },
+  {
+    "params": [
+      {
+        "type": "widget_t*",
+        "name": "widget",
+        "desc": "widget对象。"
+      },
+      {
+        "type": "const char*",
+        "name": "name",
+        "desc": "属性名。"
+      },
+      {
+        "type": "const value_t*",
+        "name": "v",
+        "desc": "属性值。"
+      }
+    ],
+    "annotation": {
+      "global": true
+    },
+    "desc": "直连 vtable 的 set_prop（供单元测试绕过 custom_props 兜底）。",
+    "name": "plot3d_set_prop_for_test",
+    "return": {
+      "type": "ret_t",
+      "desc": "返回RET_OK表示成功，否则表示失败。"
+    },
+    "type": "method",
+    "header": "plot3d/plot3d.h",
+    "level": 1
+  },
+  {
+    "params": [
+      {
+        "type": "widget_t*",
+        "name": "widget",
+        "desc": "widget对象。"
+      },
+      {
+        "type": "const char*",
+        "name": "name",
+        "desc": "属性名。"
+      },
+      {
+        "type": "value_t*",
+        "name": "v",
+        "desc": "返回属性值。"
+      }
+    ],
+    "annotation": {
+      "global": true
+    },
+    "desc": "直连 vtable 的 get_prop（供单元测试）。",
+    "name": "plot3d_get_prop_for_test",
+    "return": {
+      "type": "ret_t",
+      "desc": "返回RET_OK表示成功，否则表示失败。"
+    },
+    "type": "method",
+    "header": "plot3d/plot3d.h",
+    "level": 1
+  },
+  {
+    "params": [
+      {
+        "type": "widget_t*",
+        "name": "widget",
+        "desc": "widget对象。"
+      }
+    ],
+    "annotation": {
+      "global": true
+    },
+    "desc": "获取已创建的数据源插件实例数（供单元测试）。",
+    "name": "plot3d_get_source_nr_for_test",
+    "return": {
+      "type": "uint32_t",
+      "desc": "返回实例数。"
+    },
+    "type": "method",
+    "header": "plot3d/plot3d.h",
+    "level": 1
+  },
+  {
+    "params": [
+      {
+        "type": "widget_t*",
+        "name": "widget",
+        "desc": "widget对象。"
+      }
+    ],
+    "annotation": {
+      "global": true
+    },
+    "desc": "获取已创建的配色插件实例数（供单元测试）。",
+    "name": "plot3d_get_colorizer_nr_for_test",
+    "return": {
+      "type": "uint32_t",
+      "desc": "返回实例数。"
+    },
+    "type": "method",
+    "header": "plot3d/plot3d.h",
+    "level": 1
+  },
+  {
+    "params": [
+      {
+        "type": "widget_t*",
+        "name": "widget",
+        "desc": "widget对象。"
+      }
+    ],
+    "annotation": {
+      "global": true
+    },
+    "desc": "获取已创建的图型插件实例数（供单元测试）。",
+    "name": "plot3d_get_type_nr_for_test",
+    "return": {
+      "type": "uint32_t",
+      "desc": "返回实例数。"
+    },
+    "type": "method",
+    "header": "plot3d/plot3d.h",
+    "level": 1
+  },
+  {
+    "params": [
+      {
+        "type": "widget_t*",
+        "name": "widget",
+        "desc": "widget对象。"
+      }
+    ],
+    "annotation": {
+      "global": true
+    },
+    "desc": "获取重采样次数（供单元测试）。",
+    "name": "plot3d_get_resample_nr_for_test",
+    "return": {
+      "type": "uint32_t",
+      "desc": "返回重采样次数。"
+    },
+    "type": "method",
+    "header": "plot3d/plot3d.h",
     "level": 1
   },
   {
