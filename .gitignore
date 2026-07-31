@@ -6,5 +6,7 @@ bin
 *.os
 *.dll
 *.lib
+*.obj
+__pycache__
 res
 .sconsign.dblite
