@@ -1,0 +1,10 @@
+<view w="100%" h="36" children_layout="default(row=1,col=8,s=4)">
+  <button name="btn_yaw_dec" text="Yaw-"/>
+  <button name="btn_yaw_inc" text="Yaw+"/>
+  <button name="btn_pitch_dec" text="Pitch-"/>
+  <button name="btn_pitch_inc" text="Pitch+"/>
+  <button name="btn_dist_dec" text="Dist-"/>
+  <button name="btn_dist_inc" text="Dist+"/>
+  <button name="btn_zoff_dec" text="ZOff-"/>
+  <button name="btn_zoff_inc" text="ZOff+"/>
+</view>

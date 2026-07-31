@@ -1,0 +1,28 @@
+<view w="100%" h="116" children_layout="default(row=3,col=1,s=4)">
+  <view w="100%" h="36" children_layout="default(row=1,col=6,s=4)">
+    <button name="btn_x_grid_count_dec" text="Xgc-"/>
+    <button name="btn_x_grid_count_inc" text="Xgc+"/>
+    <button name="btn_y_grid_count_dec" text="Ygc-"/>
+    <button name="btn_y_grid_count_inc" text="Ygc+"/>
+    <button name="btn_z_grid_count_dec" text="Zgc-"/>
+    <button name="btn_z_grid_count_inc" text="Zgc+"/>
+  </view>
+
+  <view w="100%" h="36" children_layout="default(row=1,col=6,s=4)">
+    <button name="btn_xy_grid_dec" text="XYz-"/>
+    <button name="btn_xy_grid_inc" text="XYz+"/>
+    <button name="btn_xz_grid_dec" text="XZy-"/>
+    <button name="btn_xz_grid_inc" text="XZy+"/>
+    <button name="btn_yz_grid_dec" text="YZx-"/>
+    <button name="btn_yz_grid_inc" text="YZx+"/>
+  </view>
+
+  <view w="100%" h="36" children_layout="default(row=1,col=6,s=4)">
+    <button name="btn_box_aspect_x_dec" text="BXa-"/>
+    <button name="btn_box_aspect_x_inc" text="BXa+"/>
+    <button name="btn_box_aspect_y_dec" text="BYa-"/>
+    <button name="btn_box_aspect_y_inc" text="BYa+"/>
+    <button name="btn_box_aspect_z_dec" text="BZa-"/>
+    <button name="btn_box_aspect_z_inc" text="BZa+"/>
+  </view>
+</view>

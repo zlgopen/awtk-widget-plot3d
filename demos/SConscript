@@ -1,0 +1,21 @@
+import os
+import sys
+
+env=DefaultEnvironment().Clone()
+BIN_DIR=os.environ['BIN_DIR'];
+
+env['LIBS'] = ['plot3d'] + env['LIBS']
+
+common_sources = Glob('common/*.c')
+entry_sources = ['app_main.c']
+
+env.Program(os.path.join(BIN_DIR, 'demo_csv'), entry_sources + ['demo_csv.c'] + common_sources);
+env.Program(os.path.join(BIN_DIR, 'demo_grid'), entry_sources + ['demo_grid.c'] + common_sources);
+env.Program(os.path.join(BIN_DIR, 'demo_expr'), entry_sources + ['demo_expr.c'] + common_sources);
+env.Program(os.path.join(BIN_DIR, 'demo_matrix'), entry_sources + ['demo_matrix.c'] + common_sources);
+env.Program(os.path.join(BIN_DIR, 'demo_curve'), entry_sources + ['demo_curve.c'] + common_sources);
+env.Program(os.path.join(BIN_DIR, 'demo_csv_min'), entry_sources + ['demo_csv_min.c']);
+env.Program(os.path.join(BIN_DIR, 'demo_grid_min'), entry_sources + ['demo_grid_min.c']);
+env.Program(os.path.join(BIN_DIR, 'demo_expr_min'), entry_sources + ['demo_expr_min.c']);
+env.Program(os.path.join(BIN_DIR, 'demo_matrix_min'), entry_sources + ['demo_matrix_min.c']);
+env.Program(os.path.join(BIN_DIR, 'demo_curve_min'), entry_sources + ['demo_curve_min.c']);

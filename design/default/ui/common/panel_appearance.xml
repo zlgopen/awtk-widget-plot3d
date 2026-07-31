@@ -1,0 +1,33 @@
+<view w="100%" h="156" children_layout="default(row=4,col=1,s=4)">
+  <view w="100%" h="36" children_layout="default(row=1,col=4,s=4)">
+    <label text="GridColor"/>
+    <combo_box name="cb_grid_color" readonly="true" options="#66666688;#222222ff;#999999ff;#ff000088;#00aa00ff;#0000ffff" selected_index="0"/>
+    <label text="TickColor"/>
+    <combo_box name="cb_tick_color" readonly="true" options="#888888ff;#222222ff;#999999ff;#ff000088;#00aa00ff;#0000ffff" selected_index="0"/>
+  </view>
+
+  <view w="100%" h="36" children_layout="default(row=1,col=6,s=4)">
+    <label text="XAxis"/>
+    <combo_box name="cb_xaxis_color" readonly="true" options="#e74c3cff;#ff0000ff;#27ae60ff;#2980b9ff;#222222ff;#ffffffff" selected_index="0"/>
+    <label text="YAxis"/>
+    <combo_box name="cb_yaxis_color" readonly="true" options="#27ae60ff;#e74c3cff;#2980b9ff;#ff0000ff;#222222ff;#ffffffff" selected_index="0"/>
+    <label text="ZAxis"/>
+    <combo_box name="cb_zaxis_color" readonly="true" options="#2980b9ff;#e74c3cff;#27ae60ff;#ff0000ff;#222222ff;#ffffffff" selected_index="0"/>
+  </view>
+
+  <view w="100%" h="36" children_layout="default(row=1,col=4,s=4)">
+    <check_button name="chk_show_grid" text="ShowGrid" value="true"/>
+    <check_button name="chk_show_axis_tick" text="ShowAxisTick" value="true"/>
+    <check_button name="chk_enable_cache" text="EnableCache" value="true"/>
+    <check_button name="chk_equal_axis" text="EqualAxis" value="false"/>
+  </view>
+
+  <view w="100%" h="36" children_layout="default(row=1,col=6,s=4)">
+    <button name="btn_point_size_dec" text="PS-"/>
+    <button name="btn_point_size_inc" text="PS+"/>
+    <button name="btn_line_width_dec" text="LW-"/>
+    <button name="btn_line_width_inc" text="LW+"/>
+    <button name="btn_axis_neg_bright_dec" text="NegB-"/>
+    <button name="btn_axis_neg_bright_inc" text="NegB+"/>
+  </view>
+</view>

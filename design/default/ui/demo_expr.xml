@@ -1,0 +1,49 @@
+<window theme="main">
+  <plot3d name="chart" x="0" y="0" w="100%" h="58%"/>
+  <tab_control x="0" y="b:0" w="100%" h="42%" children_layout="default(r=0,c=1,s=0)">
+    <tab_button_group h="32" compact="true" scrollable="true">
+      <tab_button value="true" text="Data"/>
+      <tab_button text="PlotType"/>
+      <tab_button text="Appearance"/>
+      <tab_button text="GridAxis"/>
+      <tab_button text="Camera"/>
+    </tab_button_group>
+    <pages h="-32">
+      <scroll_view w="100%" h="100%">
+        <view w="100%" h="116" children_layout="default(row=3,col=1,s=4,xm=8,ym=4)">
+          <view w="100%" h="36" children_layout="default(row=1,col=4,s=4)">
+            <label text="Preset"/>
+            <combo_box name="cb_preset" readonly="true" options="ExprWave;ExprCone;ExprRose;ExprBars;ColorRadial;ColorSplit" selected_index="0"/>
+          </view>
+          <view w="100%" h="36" children_layout="default(row=1,col=8,s=4)">
+            <combo_box name="cb_colormap" readonly="true" options="viridis;jet;gray;parula;hot;cool;hsv;bone;copper;pink;turbo" selected_index="0"/>
+            <button name="btn_sample_steps_dec" text="Step-"/>
+            <button name="btn_sample_steps_inc" text="Step+"/>
+            <button name="btn_sample_range_dec" text="Rng-"/>
+            <button name="btn_sample_range_inc" text="Rng+"/>
+            <label name="lbl_sample_info" text=""/>
+          </view>
+          <view w="100%" h="36" children_layout="default(row=1,col=5,s=4)">
+            <label text="z ="/>
+            <edit name="edit_z_expr" text="" tips="z = f(x, y)"/>
+            <label text="color ="/>
+            <edit name="edit_color_expr" text="" tips="值或颜色字符串"/>
+            <button name="btn_expr_apply" text="Apply"/>
+          </view>
+        </view>
+      </scroll_view>
+      <scroll_view w="100%" h="100%">
+        <view name="slot_plot_type" x="8" y="4" w="-16" h="-8"/>
+      </scroll_view>
+      <scroll_view w="100%" h="100%">
+        <view name="slot_appearance" x="8" y="4" w="-16" h="-8"/>
+      </scroll_view>
+      <scroll_view w="100%" h="100%">
+        <view name="slot_grid_axis" x="8" y="4" w="-16" h="-8"/>
+      </scroll_view>
+      <scroll_view w="100%" h="100%">
+        <view name="slot_camera" x="8" y="4" w="-16" h="-8"/>
+      </scroll_view>
+    </pages>
+  </tab_control>
+</window>

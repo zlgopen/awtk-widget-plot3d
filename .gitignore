@@ -1,0 +1,9 @@
+docs/superpowers
+bin
+*.o
+*.so
+*.a
+*.os
+*.dll
+*.lib
+res

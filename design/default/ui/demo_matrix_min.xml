@@ -1,0 +1,4 @@
+<window theme="main">
+  <label x="0" y="0" w="100%" h="36" text="Matrix"/>
+  <plot3d name="chart" x="0" y="36" w="100%" h="-36"/>
+</window>

@@ -1,0 +1,44 @@
+import os
+import sys
+import platform
+
+OS_NAME = platform.system();
+LIB_DIR=os.environ['LIB_DIR'];
+BIN_DIR=os.environ['BIN_DIR'];
+
+env=DefaultEnvironment().Clone()
+# 核心（不可裁剪）
+CORE_SOURCES = [
+  'plot3d/plot3d.c',
+  'plot3d/plot3d_colormap.c',
+  'plot3d/plot3d_scene.c',
+  'plot3d/plot3d_paint.c',
+  'plot3d/plot3d_datatip.c',
+]
+# 数据源插件：按需增删
+SOURCE_PLUGINS = [
+  'plot3d/source/plot3d_source.c',
+  'plot3d/source/plot3d_source_csv.c',
+  'plot3d/source/plot3d_source_grid.c',
+  'plot3d/source/plot3d_source_curve.c',
+  'plot3d/source/plot3d_source_matrix.c',
+]
+COLORIZER_PLUGINS = [
+  'plot3d/colorizer/plot3d_colorizer.c',
+  'plot3d/colorizer/plot3d_colorizer_expr.c',
+]
+TYPE_PLUGINS = ['plot3d/type/plot3d_type.c', 'plot3d/type/plot3d_type_line.c', 'plot3d/type/plot3d_type_dot.c', 'plot3d/type/plot3d_type_surface.c', 'plot3d/type/plot3d_type_cylinder.c']
+SOURCES = CORE_SOURCES + SOURCE_PLUGINS + COLORIZER_PLUGINS + TYPE_PLUGINS + Glob('*.c')
+
+EXPORT_DEF=''
+if OS_NAME == 'Windows' :
+  if os.environ['TOOLS_NAME'] == '' :
+    EXPORT_DEF = ' /DEF:"src/plot3d.def" '
+  elif os.environ['TOOLS_NAME'] == 'mingw' :
+    EXPORT_DEF = ' "src/plot3d.def" '
+
+if 'BUILD_SHARED' in os.environ and os.environ['BUILD_SHARED'] == 'True':
+  LINKFLAGS=env['LINKFLAGS'] + EXPORT_DEF 
+  env.SharedLibrary(os.path.join(BIN_DIR, 'plot3d'), SOURCES, LINKFLAGS=LINKFLAGS);
+else:
+  env.Library(os.path.join(LIB_DIR, 'plot3d'), SOURCES);

@@ -1,0 +1,44 @@
+<window theme="main">
+  <plot3d name="chart" x="0" y="0" w="100%" h="58%"/>
+  <tab_control x="0" y="b:0" w="100%" h="42%" children_layout="default(r=0,c=1,s=0)">
+    <tab_button_group h="32" compact="true" scrollable="true">
+      <tab_button value="true" text="Data"/>
+      <tab_button text="PlotType"/>
+      <tab_button text="Appearance"/>
+      <tab_button text="GridAxis"/>
+      <tab_button text="Camera"/>
+    </tab_button_group>
+    <pages h="-32">
+      <scroll_view w="100%" h="100%">
+        <view x="8" y="4" w="-16" h="76" children_layout="default(row=2,col=1,s=4)">
+          <view w="100%" h="36" children_layout="default(row=1,col=4,s=4)">
+            <label text="Preset"/>
+            <combo_box name="cb_preset" readonly="true" options="FuncRipple" selected_index="0"/>
+          </view>
+          <view w="100%" h="36" children_layout="default(row=1,col=9,s=4)">
+            <label text="Func"/>
+            <combo_box name="cb_func" readonly="true" options="None;Ripple;SinWave;Peaks;Sombrero;Saddle;Gauss" selected_index="0"/>
+            <combo_box name="cb_colormap" readonly="true" options="viridis;jet;gray;parula;hot;cool;hsv;bone;copper;pink;turbo" selected_index="0"/>
+            <button name="btn_sample_steps_dec" text="Step-"/>
+            <button name="btn_sample_steps_inc" text="Step+"/>
+            <button name="btn_sample_range_dec" text="Rng-"/>
+            <button name="btn_sample_range_inc" text="Rng+"/>
+            <label name="lbl_sample_info" text=""/>
+          </view>
+        </view>
+      </scroll_view>
+      <scroll_view w="100%" h="100%">
+        <view name="slot_plot_type" x="8" y="4" w="-16" h="36"/>
+      </scroll_view>
+      <scroll_view w="100%" h="100%">
+        <view name="slot_appearance" x="8" y="4" w="-16" h="156"/>
+      </scroll_view>
+      <scroll_view w="100%" h="100%">
+        <view name="slot_grid_axis" x="8" y="4" w="-16" h="116"/>
+      </scroll_view>
+      <scroll_view w="100%" h="100%">
+        <view name="slot_camera" x="8" y="4" w="-16" h="36"/>
+      </scroll_view>
+    </pages>
+  </tab_control>
+</window>

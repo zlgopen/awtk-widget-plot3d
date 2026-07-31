@@ -1,0 +1,6 @@
+<view w="100%" h="36" children_layout="default(row=1,col=4,s=4)">
+  <radio_button name="btn_dot" text="Dot"/>
+  <radio_button name="btn_line" text="Line"/>
+  <radio_button name="btn_surface" text="Surface" value="true"/>
+  <radio_button name="btn_cylinder" text="Cylinder"/>
+</view>

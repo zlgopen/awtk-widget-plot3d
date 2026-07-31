@@ -1,0 +1,3541 @@
+[
+  {
+    "params": [],
+    "annotation": {
+      "global": true
+    },
+    "desc": "注册控件。\n\n只注册控件，刻意不注册任何内置插件，以便资源受限的场景手工注册用到的插件；\n需要全部内置插件请用 plot3d_register_all。",
+    "name": "plot3d_register",
+    "return": {
+      "type": "ret_t",
+      "desc": "返回RET_OK表示成功，否则表示失败。"
+    },
+    "type": "method",
+    "header": "src/plot3d_register.h",
+    "level": 1
+  },
+  {
+    "params": [],
+    "annotation": {
+      "global": true
+    },
+    "desc": "注册控件及全部内置插件。\n\n资源受限的场景可以改用 plot3d_register 只注册控件，再手工注册用到的插件。",
+    "name": "plot3d_register_all",
+    "return": {
+      "type": "ret_t",
+      "desc": "返回RET_OK表示成功，否则表示失败。"
+    },
+    "type": "method",
+    "header": "src/plot3d_register.h",
+    "level": 1
+  },
+  {
+    "params": [],
+    "annotation": {
+      "global": true
+    },
+    "desc": "反注册控件及全部插件。\n\n必须在 tk_deinit/tk_deinit_internal 之前调用：tk_deinit_internal 会销毁控件工厂并把它\n置为 NULL，之后再调用只会返回RET_BAD_PARAMS并刷日志。调用之后不应再创建或操作 plot3d\n控件。重复调用是安全的。",
+    "name": "plot3d_unregister",
+    "return": {
+      "type": "ret_t",
+      "desc": "返回RET_OK表示成功，否则表示失败。"
+    },
+    "type": "method",
+    "header": "src/plot3d_register.h",
+    "level": 1
+  },
+  {
+    "params": [],
+    "annotation": {
+      "global": true
+    },
+    "desc": "获取支持的渲染模式。",
+    "name": "plot3d_supported_render_mode",
+    "return": {
+      "type": "const char*",
+      "desc": "返回渲染模式。"
+    },
+    "type": "method",
+    "header": "src/plot3d_register.h",
+    "level": 1
+  },
+  {
+    "type": "class",
+    "methods": [
+      {
+        "params": [
+          {
+            "type": "plot3d_colorizer_t*",
+            "name": "colorizer",
+            "desc": "配色插件对象。"
+          }
+        ],
+        "annotation": {},
+        "desc": "判断配色插件是否已被喂入可用的配色数据。",
+        "name": "plot3d_colorizer_is_active",
+        "return": {
+          "type": "bool_t",
+          "desc": "返回TRUE表示生效，否则表示不生效。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "plot3d_colorizer_t*",
+            "name": "colorizer",
+            "desc": "配色插件对象。"
+          },
+          {
+            "type": "const plot3d_sample_pos_t*",
+            "name": "pos",
+            "desc": "采样点位置。"
+          },
+          {
+            "type": "plot3d_color_value_t*",
+            "name": "out",
+            "desc": "返回配色，求值失败时保持调用方填好的默认值。"
+          }
+        ],
+        "annotation": {},
+        "desc": "求一个采样点的配色。调用之前 out 须已填好默认值。",
+        "name": "plot3d_colorizer_eval",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "plot3d_colorizer_t*",
+            "name": "colorizer",
+            "desc": "配色插件对象。"
+          },
+          {
+            "type": "const char*",
+            "name": "name",
+            "desc": "属性名。"
+          },
+          {
+            "type": "const value_t*",
+            "name": "v",
+            "desc": "属性值。"
+          }
+        ],
+        "annotation": {},
+        "desc": "设置配色插件的属性。\n\n非法（原值不变），RET_NOT_FOUND表示插件不认识该属性。核心的属性广播依赖这\n三个返回值区分「认领并接受」「认领但拒绝」「未认领」。",
+        "name": "plot3d_colorizer_set_prop",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示插件认领该属性且值合法，RET_BAD_PARAMS表示认领该属性但值"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "plot3d_colorizer_t*",
+            "name": "colorizer",
+            "desc": "配色插件对象。"
+          },
+          {
+            "type": "const char*",
+            "name": "name",
+            "desc": "属性名。"
+          },
+          {
+            "type": "value_t*",
+            "name": "v",
+            "desc": "返回属性值。"
+          }
+        ],
+        "annotation": {},
+        "desc": "获取配色插件的属性。",
+        "name": "plot3d_colorizer_get_prop",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，RET_NOT_FOUND表示插件不认识该属性。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "plot3d_colorizer_t*",
+            "name": "colorizer",
+            "desc": "配色插件对象。"
+          },
+          {
+            "type": "const char*",
+            "name": "name",
+            "desc": "数据名。"
+          },
+          {
+            "type": "void*",
+            "name": "p1",
+            "desc": "第一个参数，含义与所有权由该插件声明。"
+          },
+          {
+            "type": "void*",
+            "name": "p2",
+            "desc": "第二个参数，含义与所有权由该插件声明。"
+          }
+        ],
+        "annotation": {},
+        "desc": "给配色插件设置回调函数、ctx 等 value_t 不便表达的数据。\n\nname 沿用 kebab-case，与属性名保持同一套命名。\n\n所有权总则：数据由调用方提供，**由插件决定是拷贝还是借用**，因此每个插件必须逐个声明它支持的\nname、对应的 p1/p2 含义，以及是拷贝还是借用；借用时还要写明调用方需要维持数据有效的期限。\n内置的 expr 插件支持 PLOT3D_COLORIZER_DATA_COLOR_FUNC，见该宏的说明。",
+        "name": "plot3d_colorizer_set_data",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，RET_NOT_FOUND表示插件不认识该数据名。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "plot3d_colorizer_t*",
+            "name": "colorizer",
+            "desc": "配色插件对象。"
+          }
+        ],
+        "annotation": {},
+        "desc": "销毁配色插件对象。",
+        "name": "plot3d_colorizer_destroy",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "const plot3d_colorizer_vtable_t*",
+            "name": "vt",
+            "desc": "配色插件的虚函数表，需要在注册期间一直有效，"
+          }
+        ],
+        "annotation": {},
+        "desc": "注册配色插件，type 相同时替换原有的插件，以便用户用自己的实现覆盖内置插件。\n其 type/create/destroy 三个成员不能为 NULL。",
+        "name": "plot3d_colorizer_factory_register",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "const char*",
+            "name": "type",
+            "desc": "配色插件的类型名。"
+          }
+        ],
+        "annotation": {},
+        "desc": "创建指定类型的配色插件对象。",
+        "name": "plot3d_colorizer_factory_create",
+        "return": {
+          "type": "plot3d_colorizer_t*",
+          "desc": "返回配色插件对象，类型未注册时返回NULL。"
+        }
+      },
+      {
+        "params": [],
+        "annotation": {},
+        "desc": "获取已注册的配色插件的个数。",
+        "name": "plot3d_colorizer_factory_count",
+        "return": {
+          "type": "uint32_t",
+          "desc": "返回已注册的插件个数。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "uint32_t",
+            "name": "index",
+            "desc": "序号。"
+          }
+        ],
+        "annotation": {},
+        "desc": "获取指定序号的配色插件的虚函数表。",
+        "name": "plot3d_colorizer_factory_get",
+        "return": {
+          "type": "const plot3d_colorizer_vtable_t*",
+          "desc": "返回虚函数表，序号无效时返回NULL。"
+        }
+      },
+      {
+        "params": [],
+        "annotation": {},
+        "desc": "清空配色插件注册表，重复调用是安全的。",
+        "name": "plot3d_colorizer_factory_deinit",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "const char*",
+            "name": "name",
+            "desc": "配色表名称。"
+          },
+          {
+            "type": "float_t",
+            "name": "t",
+            "desc": "归一化位置，超出 [0,1] 时钳到两端。"
+          },
+          {
+            "type": "color_t*",
+            "name": "out_color",
+            "desc": "返回颜色。"
+          }
+        ],
+        "annotation": {},
+        "desc": "按配色表取色：色标之间线性插值，名字不认识时用默认配色表。",
+        "name": "plot3d_colormap_get_color",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "void*",
+            "name": "ctx",
+            "desc": "回调上下文。"
+          },
+          {
+            "type": "float_t",
+            "name": "x",
+            "desc": "x坐标。"
+          },
+          {
+            "type": "float_t",
+            "name": "y",
+            "desc": "y坐标。"
+          },
+          {
+            "type": "float_t*",
+            "name": "z",
+            "desc": "返回z坐标。"
+          }
+        ],
+        "annotation": {},
+        "desc": "网格采样函数：给定 x/y 返回 z，相当于 matlab 里 surf 用的 z=f(x,y)。",
+        "name": "plot3d_grid_func_t",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则该点被丢弃。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "void*",
+            "name": "ctx",
+            "desc": "回调上下文。"
+          },
+          {
+            "type": "float_t",
+            "name": "t",
+            "desc": "曲线参数。"
+          },
+          {
+            "type": "float_t*",
+            "name": "x",
+            "desc": "返回x坐标。"
+          },
+          {
+            "type": "float_t*",
+            "name": "y",
+            "desc": "返回y坐标。"
+          },
+          {
+            "type": "float_t*",
+            "name": "z",
+            "desc": "返回z坐标。"
+          }
+        ],
+        "annotation": {},
+        "desc": "参数曲线的采样函数：由参数t算出一个点的坐标。",
+        "name": "plot3d_curve_func_t",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则该点被丢弃。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "void*",
+            "name": "ctx",
+            "desc": "回调上下文。"
+          },
+          {
+            "type": "float_t",
+            "name": "x",
+            "desc": "x坐标。"
+          },
+          {
+            "type": "float_t",
+            "name": "y",
+            "desc": "y坐标。"
+          },
+          {
+            "type": "float_t",
+            "name": "z",
+            "desc": "z坐标。"
+          },
+          {
+            "type": "color_t*",
+            "name": "color",
+            "desc": "返回颜色。"
+          }
+        ],
+        "annotation": {},
+        "desc": "采样点的配色函数：由点的坐标算出颜色，用来取代默认的配色表。",
+        "name": "plot3d_color_func_t",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则该点用配色表取色。"
+        }
+      }
+    ],
+    "events": [],
+    "properties": [],
+    "header": "colorizer/plot3d_colorizer.h",
+    "desc": "配色插件的实例，各插件把它作为自己结构体的第一个成员。",
+    "name": "plot3d_colorizer_t",
+    "level": 1
+  },
+  {
+    "params": [],
+    "annotation": {
+      "global": true
+    },
+    "desc": "注册表达式配色插件（类型名 \"expr\"）。",
+    "name": "plot3d_colorizer_expr_register",
+    "return": {
+      "type": "ret_t",
+      "desc": "返回RET_OK表示成功，否则表示失败。"
+    },
+    "type": "method",
+    "header": "colorizer/plot3d_colorizer.h",
+    "level": 1
+  },
+  {
+    "type": "class",
+    "methods": [],
+    "events": [],
+    "properties": [
+      {
+        "name": "x",
+        "desc": "X 坐标。",
+        "type": "float_t",
+        "annotation": {
+          "readable": true,
+          "scriptable": true
+        }
+      },
+      {
+        "name": "y",
+        "desc": "Y 坐标。",
+        "type": "float_t",
+        "annotation": {
+          "readable": true,
+          "scriptable": true
+        }
+      },
+      {
+        "name": "z",
+        "desc": "Z 坐标。",
+        "type": "float_t",
+        "annotation": {
+          "readable": true,
+          "scriptable": true
+        }
+      },
+      {
+        "name": "color",
+        "desc": "点颜色。",
+        "type": "color_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "is_break",
+        "desc": "是否为折线分段点。",
+        "type": "bool_t",
+        "annotation": {
+          "readable": true,
+          "scriptable": true
+        }
+      }
+    ],
+    "header": "plot3d/plot3d.h",
+    "desc": "三维数据点。",
+    "name": "plot3d_data_point_t",
+    "annotation": {
+      "scriptable": true
+    },
+    "level": 1
+  },
+  {
+    "type": "class",
+    "methods": [],
+    "events": [],
+    "properties": [
+      {
+        "name": "is_color",
+        "desc": "为TRUE表示直接用 color，为FALSE表示按 scalar 在配色表上取色。",
+        "type": "bool_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "color",
+        "desc": "is_color 为TRUE时的颜色。",
+        "type": "color_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "scalar",
+        "desc": "is_color 为FALSE时的标量，全部采样点算完后统一归一化再查配色表。",
+        "type": "float_t",
+        "annotation": {
+          "readable": true
+        }
+      }
+    ],
+    "header": "plot3d/plot3d.h",
+    "desc": "一个采样点的配色来源：要么已经是颜色，要么是待归一化的标量。",
+    "name": "plot3d_color_value_t",
+    "level": 1
+  },
+  {
+    "type": "class",
+    "methods": [
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "parent",
+            "desc": "父控件"
+          },
+          {
+            "type": "xy_t",
+            "name": "x",
+            "desc": "x坐标"
+          },
+          {
+            "type": "xy_t",
+            "name": "y",
+            "desc": "y坐标"
+          },
+          {
+            "type": "wh_t",
+            "name": "w",
+            "desc": "宽度"
+          },
+          {
+            "type": "wh_t",
+            "name": "h",
+            "desc": "高度"
+          }
+        ],
+        "annotation": {
+          "constructor": true,
+          "scriptable": true
+        },
+        "desc": "创建plot3d对象",
+        "name": "plot3d_create",
+        "return": {
+          "type": "widget_t*",
+          "desc": "plot3d对象。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "plot3d对象。"
+          }
+        ],
+        "annotation": {
+          "cast": true,
+          "scriptable": true
+        },
+        "desc": "转换为plot3d对象(供脚本语言使用)。",
+        "name": "plot3d_cast",
+        "return": {
+          "type": "widget_t*",
+          "desc": "plot3d对象。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "const char*",
+            "name": "dataset",
+            "desc": "csv format data set. 每行一个点。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "设置 csv format data set. 每行一个点。",
+        "name": "plot3d_set_dataset",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "const char*",
+            "name": "plottype",
+            "desc": "chart type: dot,line,surface,cylinder。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "设置 chart type: dot,line,surface,cylinder。",
+        "name": "plot3d_set_plottype",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "清空数据点。",
+        "name": "plot3d_reset_data",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "float_t",
+            "name": "x",
+            "desc": "x坐标。"
+          },
+          {
+            "type": "float_t",
+            "name": "y",
+            "desc": "y坐标。"
+          },
+          {
+            "type": "float_t",
+            "name": "z",
+            "desc": "z坐标。"
+          },
+          {
+            "type": "const char*",
+            "name": "color",
+            "desc": "颜色字符串(支持color_parse格式)。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "追加一个数据点。",
+        "name": "plot3d_append_data_point",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "追加一个分段点。",
+        "name": "plot3d_append_break_data_point",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "获取数据点数量（含break点）。",
+        "name": "plot3d_get_data_points_nr",
+        "return": {
+          "type": "uint32_t",
+          "desc": "数据点数量。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "uint32_t",
+            "name": "index",
+            "desc": "索引。"
+          },
+          {
+            "type": "plot3d_data_point_t*",
+            "name": "point",
+            "desc": "返回数据点。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "获取指定索引的数据点（含break点）。",
+        "name": "plot3d_get_data_point",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "plot3d_grid_func_t",
+            "name": "func",
+            "desc": "采样函数，为NULL表示取消。"
+          },
+          {
+            "type": "void*",
+            "name": "ctx",
+            "desc": "回调上下文。"
+          }
+        ],
+        "annotation": {},
+        "desc": "设置网格采样函数，控件按 sample-x-range/sample-y-range/sample-steps 采样并按 plottype 排布：\nsurface 自动三角化，line 每行一条折线，dot/cylinder 直接铺点。\n设置采样函数会让位于它的 dataset 数据失效。",
+        "name": "plot3d_set_grid_func",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "const char*",
+            "name": "sample_mode",
+            "desc": "none、grid 或 curve。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "设置函数采样模式。",
+        "name": "plot3d_set_sample_mode",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "const char*",
+            "name": "sample_x_range",
+            "desc": "形如 \"0,360\"。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "设置网格采样的 x 范围。",
+        "name": "plot3d_set_sample_x_range",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "const char*",
+            "name": "sample_y_range",
+            "desc": "形如 \"0,7\"。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "设置网格采样的 y 范围。",
+        "name": "plot3d_set_sample_y_range",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "const char*",
+            "name": "sample_steps",
+            "desc": "形如 \"25,8\"，只写一个数时两个方向相同。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "设置网格采样的格点数。",
+        "name": "plot3d_set_sample_steps",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "const char*",
+            "name": "colormap",
+            "desc": "viridis、jet、gray、parula、hot、cool、hsv、bone、copper、pink 或 turbo。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "设置函数采样点的配色表。",
+        "name": "plot3d_set_colormap",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "const char*",
+            "name": "sample_z_expr",
+            "desc": "表达式，如 \"sin(x) + cos(y)\"。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "设置网格采样的 z 表达式，变量为 x 与 y，可用 sin/cos/pow 等函数。\n与采样函数同时存在时以采样函数为准；表达式为空表示不用表达式。",
+        "name": "plot3d_set_sample_z_expr",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，语法不合法时返回RET_BAD_PARAMS且保持原表达式。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "const char*",
+            "name": "sample_z_matrix",
+            "desc": "矩阵，为空表示清空矩阵。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "设置 matrix 模式的 z 矩阵，形如 \"1,2,3;4,5,6\"，分号或换行分行。\nx 与 y 默认取列号与行号，设置了 sample_x_range 或 sample_y_range 则映射到该范围。\n\n矩阵数据源未注册（裁剪场景）时同样返回RET_BAD_PARAMS。",
+        "name": "plot3d_set_sample_z_matrix",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功；各行列数不同等格式错误时返回RET_BAD_PARAMS且保持原矩阵；"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "const float_t*",
+            "name": "zs",
+            "desc": "按行存放的 cols*rows 个 z 值，为NULL表示清空矩阵。"
+          },
+          {
+            "type": "uint32_t",
+            "name": "cols",
+            "desc": "列数。"
+          },
+          {
+            "type": "uint32_t",
+            "name": "rows",
+            "desc": "行数。"
+          }
+        ],
+        "annotation": {},
+        "desc": "直接用内存中的 z 矩阵，数据会拷贝一份，与 sample_z_matrix 属性共用，后设置的生效。\n\n其它情况表示失败。",
+        "name": "plot3d_set_z_matrix",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功；矩阵数据源未注册（裁剪场景）时返回RET_NOT_FOUND；"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "const char*",
+            "name": "sample_x_expr",
+            "desc": "表达式，如 \"cos(t)\"。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "设置 curve 模式下 x 的表达式，变量为 t，为空时 x 取 t。",
+        "name": "plot3d_set_sample_x_expr",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，语法不合法时返回RET_BAD_PARAMS且保持原表达式。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "const char*",
+            "name": "sample_y_expr",
+            "desc": "表达式，如 \"sin(t)\"。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "设置 curve 模式下 y 的表达式，变量为 t，为空时 y 取 0。",
+        "name": "plot3d_set_sample_y_expr",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，语法不合法时返回RET_BAD_PARAMS且保持原表达式。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "const char*",
+            "name": "sample_t_range",
+            "desc": "形如 \"0,6.28\"。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "设置曲线采样的参数 t 范围。",
+        "name": "plot3d_set_sample_t_range",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "uint32_t",
+            "name": "sample_t_steps",
+            "desc": "点数。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "设置曲线采样的点数。",
+        "name": "plot3d_set_sample_t_steps",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "plot3d_curve_func_t",
+            "name": "func",
+            "desc": "采样函数，为NULL表示取消。"
+          },
+          {
+            "type": "void*",
+            "name": "ctx",
+            "desc": "回调上下文。"
+          }
+        ],
+        "annotation": {},
+        "desc": "设置曲线采样函数，控件按 sample-t-range/sample-t-steps 采样，得到一条连续的点序列。\n设置采样函数会让位于它的 dataset 数据失效。\n\n其它情况表示失败。",
+        "name": "plot3d_set_curve_func",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功；曲线数据源未注册（裁剪场景）时返回RET_NOT_FOUND；"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "const char*",
+            "name": "sample_color_expr",
+            "desc": "表达式，如 \"sqrt(x * x + y * y)\"。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "设置采样点的配色表达式，变量为 x、y、z（curve 模式还有 t）。\n结果为颜色字符串时直接用该颜色，为数值时按该值在配色表上取色。\n与配色函数同时存在时以配色函数为准；表达式为空表示按 z 取色。\n\n表达式配色插件未注册（裁剪场景）时同样返回RET_BAD_PARAMS。",
+        "name": "plot3d_set_sample_color_expr",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功；语法不合法时返回RET_BAD_PARAMS且保持原表达式；"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "plot3d_color_func_t",
+            "name": "func",
+            "desc": "配色函数，为NULL表示取消。"
+          },
+          {
+            "type": "void*",
+            "name": "ctx",
+            "desc": "回调上下文。"
+          }
+        ],
+        "annotation": {},
+        "desc": "设置采样点的配色函数，取代默认的按 z 在配色表上取色。\n\n其它情况表示失败。",
+        "name": "plot3d_set_color_func",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功；表达式配色插件未注册（裁剪场景）时返回RET_NOT_FOUND；"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "const char*",
+            "name": "text",
+            "desc": "形如 \"min,max\"。"
+          },
+          {
+            "type": "float_t*",
+            "name": "out_min",
+            "desc": "返回下界。"
+          },
+          {
+            "type": "float_t*",
+            "name": "out_max",
+            "desc": "返回上界。"
+          }
+        ],
+        "annotation": {},
+        "desc": "解析采样范围，顺序写反时按小到大返回。",
+        "name": "plot3d_parse_range",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "const char*",
+            "name": "text",
+            "desc": "形如 \"cols,rows\"，只写一个数时两个方向相同。"
+          },
+          {
+            "type": "uint32_t*",
+            "name": "out_cols",
+            "desc": "返回 x 方向格点数。"
+          },
+          {
+            "type": "uint32_t*",
+            "name": "out_rows",
+            "desc": "返回 y 方向格点数。"
+          }
+        ],
+        "annotation": {},
+        "desc": "解析采样格点数，结果钳到 PLOT3D_MIN_SAMPLE_STEPS 与 PLOT3D_MAX_SAMPLE_STEPS 之间。",
+        "name": "plot3d_parse_steps",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "plot3d_sample_pos_t*",
+            "name": "pos",
+            "desc": "采样点位置。"
+          },
+          {
+            "type": "float_t",
+            "name": "x",
+            "desc": "x坐标。"
+          },
+          {
+            "type": "float_t",
+            "name": "y",
+            "desc": "y坐标。"
+          },
+          {
+            "type": "float_t",
+            "name": "z",
+            "desc": "z坐标。"
+          }
+        ],
+        "annotation": {},
+        "desc": "初始化采样点位置：全部字段清零后填入 x/y/z，t 按未定义处理。\n\n曲线等有参数 t 的场景在本函数之后再填 t 与 has_t，其它场景直接用即可，不必操心 has_t。",
+        "name": "plot3d_sample_pos_init",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "const char*",
+            "name": "name",
+            "desc": "配色表名称。"
+          },
+          {
+            "type": "float_t",
+            "name": "t",
+            "desc": "归一化位置，超出 [0,1] 时钳到两端。"
+          },
+          {
+            "type": "color_t*",
+            "name": "out_color",
+            "desc": "返回颜色。"
+          }
+        ],
+        "annotation": {},
+        "desc": "按配色表取色：色标之间线性插值，名字不认识时用默认配色表。",
+        "name": "plot3d_colormap_get_color",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "const char*",
+            "name": "xlabel",
+            "desc": "X 轴名称。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "设置 X 轴名称。",
+        "name": "plot3d_set_xlabel",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "const char*",
+            "name": "ylabel",
+            "desc": "Y 轴名称。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "设置 Y 轴名称。",
+        "name": "plot3d_set_ylabel",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "const char*",
+            "name": "zlabel",
+            "desc": "Z 轴名称。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "设置 Z 轴名称。",
+        "name": "plot3d_set_zlabel",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "bool_t",
+            "name": "show_grid",
+            "desc": "是否显示网格。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "设置是否显示网格。",
+        "name": "plot3d_set_show_grid",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "bool_t",
+            "name": "show_datatip",
+            "desc": "是否显示数据提示。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "设置是否显示数据提示。",
+        "name": "plot3d_set_show_datatip",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "const char*",
+            "name": "grid_color",
+            "desc": "颜色字符串。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "设置网格颜色。",
+        "name": "plot3d_set_grid_color",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "const char*",
+            "name": "xaxis_color",
+            "desc": "颜色字符串。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "设置 X 轴颜色。",
+        "name": "plot3d_set_xaxis_color",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "const char*",
+            "name": "yaxis_color",
+            "desc": "颜色字符串。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "设置 Y 轴颜色。",
+        "name": "plot3d_set_yaxis_color",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "const char*",
+            "name": "zaxis_color",
+            "desc": "颜色字符串。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "设置 Z 轴颜色。",
+        "name": "plot3d_set_zaxis_color",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "const char*",
+            "name": "tick_color",
+            "desc": "颜色字符串。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "设置刻度文字颜色。",
+        "name": "plot3d_set_tick_color",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "float_t",
+            "name": "axis_negative_brightness",
+            "desc": "亮度系数。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "设置负半轴相对正半轴的亮度系数。",
+        "name": "plot3d_set_axis_negative_brightness",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "bool_t",
+            "name": "show_axis_tick",
+            "desc": "是否显示轴刻度文字。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "设置是否显示轴刻度文字。",
+        "name": "plot3d_set_show_axis_tick",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "float_t",
+            "name": "point_size",
+            "desc": "点大小。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "设置点图点大小。",
+        "name": "plot3d_set_point_size",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "float_t",
+            "name": "line_width",
+            "desc": "线宽。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "设置折线线宽。",
+        "name": "plot3d_set_line_width",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "bool_t",
+            "name": "enable_cache",
+            "desc": "是否启用缓存。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "设置是否启用投影/绘制缓存。",
+        "name": "plot3d_set_enable_cache",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "bool_t",
+            "name": "equal_axis",
+            "desc": "是否等比例。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "设置是否三轴等比例。",
+        "name": "plot3d_set_equal_axis",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "float_t",
+            "name": "camera_yaw",
+            "desc": "方位角（弧度）。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "设置相机方位角。",
+        "name": "plot3d_set_camera_yaw",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "float_t",
+            "name": "camera_pitch",
+            "desc": "俯仰角（弧度）。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "设置相机俯仰角。",
+        "name": "plot3d_set_camera_pitch",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "float_t",
+            "name": "camera_distance",
+            "desc": "距离。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "设置相机距离。",
+        "name": "plot3d_set_camera_distance",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "float_t",
+            "name": "camera_z_offset",
+            "desc": "偏移量。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "设置相机沿 Z 方向偏移。",
+        "name": "plot3d_set_camera_z_offset",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "float_t",
+            "name": "xy_grid_position",
+            "desc": "位置。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "设置 XY 网格平面在 Z 轴上的位置。",
+        "name": "plot3d_set_xy_grid_position",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "float_t",
+            "name": "xz_grid_position",
+            "desc": "位置。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "设置 XZ 网格平面在 Y 轴上的位置。",
+        "name": "plot3d_set_xz_grid_position",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "float_t",
+            "name": "yz_grid_position",
+            "desc": "位置。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "设置 YZ 网格平面在 X 轴上的位置。",
+        "name": "plot3d_set_yz_grid_position",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "int32_t",
+            "name": "dir",
+            "desc": "方向：正数向前，负数向后。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "按刻度步进调整 XY 网格平面位置。",
+        "name": "plot3d_step_xy_grid_position",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "int32_t",
+            "name": "dir",
+            "desc": "方向：正数向前，负数向后。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "按刻度步进调整 XZ 网格平面位置。",
+        "name": "plot3d_step_xz_grid_position",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "int32_t",
+            "name": "dir",
+            "desc": "方向：正数向前，负数向后。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "按刻度步进调整 YZ 网格平面位置。",
+        "name": "plot3d_step_yz_grid_position",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "float_t",
+            "name": "box_aspect_x",
+            "desc": "相对长度系数。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "设置包围盒 X 边相对长度系数。",
+        "name": "plot3d_set_box_aspect_x",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "float_t",
+            "name": "box_aspect_y",
+            "desc": "相对长度系数。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "设置包围盒 Y 边相对长度系数。",
+        "name": "plot3d_set_box_aspect_y",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "float_t",
+            "name": "box_aspect_z",
+            "desc": "相对长度系数。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "设置包围盒 Z 边相对长度系数。",
+        "name": "plot3d_set_box_aspect_z",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "uint32_t",
+            "name": "x_grid_count",
+            "desc": "格数上限。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "设置 X 轴网格格数上限。",
+        "name": "plot3d_set_x_grid_count",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "uint32_t",
+            "name": "y_grid_count",
+            "desc": "格数上限。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "设置 Y 轴网格格数上限。",
+        "name": "plot3d_set_y_grid_count",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "uint32_t",
+            "name": "z_grid_count",
+            "desc": "格数上限。"
+          }
+        ],
+        "annotation": {
+          "scriptable": true
+        },
+        "desc": "设置 Z 轴网格格数上限。",
+        "name": "plot3d_set_z_grid_count",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      }
+    ],
+    "events": [],
+    "properties": [
+      {
+        "name": "x",
+        "desc": "X 坐标。",
+        "type": "float_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "y",
+        "desc": "Y 坐标。",
+        "type": "float_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "z",
+        "desc": "Z 坐标。",
+        "type": "float_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "t",
+        "desc": "曲线参数 t，has_t 为FALSE时无意义。",
+        "type": "float_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "has_t",
+        "desc": "t 是否有效。为FALSE时插件须把 t 当作未定义处理（如从变量表里移除），\n不得沿用上一次求值留下的值。",
+        "type": "bool_t",
+        "annotation": {
+          "readable": true
+        }
+      }
+    ],
+    "header": "plot3d/plot3d.h",
+    "desc": "一个采样点的位置，与 plot3d_color_value_t 一起构成配色求值的入参与出参。",
+    "name": "plot3d_sample_pos_t",
+    "level": 1
+  },
+  {
+    "type": "enum",
+    "desc": "数据源采样结果的类型。",
+    "consts": [
+      {
+        "desc": "散点序列，可以包含断点。",
+        "name": "PLOT3D_SOURCE_RESULT_POINTS"
+      },
+      {
+        "desc": "cols x rows 的 z 网格。",
+        "name": "PLOT3D_SOURCE_RESULT_GRID"
+      }
+    ],
+    "header": "source/plot3d_source.h",
+    "name": "plot3d_source_result_type_t",
+    "prefix": "PLOT3D_SOURCE_RESULT_",
+    "level": 1
+  },
+  {
+    "type": "class",
+    "methods": [],
+    "events": [],
+    "properties": [
+      {
+        "name": "type",
+        "desc": "结果类型，决定其它字段中哪些有效。",
+        "type": "plot3d_source_result_type_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "points",
+        "desc": "POINTS 时的数据点。由核心提供且已清空，插件往里 push TKMEM_ZALLOC 出来的\nplot3d_data_point_t*，元素的销毁由核心负责。",
+        "type": "darray_t*",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "ts",
+        "desc": "POINTS 且为曲线时，与 points 等长的参数 t 数组，供配色使用；不适用时为 NULL。\n由插件持有并复用，核心只读、不得释放，有效期至该插件的下一次\nsample / set_prop / set_data / reset 或 destroy；核心只应在本次 sample 返回后同步使用，\n不得跨调用缓存。",
+        "type": "const float_t*",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "zs",
+        "desc": "GRID 时的 cols*rows 个 z 值，按行存放。由插件持有并复用，核心只读、不得释放，\n有效期至该插件的下一次 sample / set_prop / set_data / reset 或 destroy；核心只应在本次\nsample 返回后同步使用，不得跨调用缓存。",
+        "type": "const float_t*",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "cols",
+        "desc": "GRID 的列数。",
+        "type": "uint32_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "rows",
+        "desc": "GRID 的行数。",
+        "type": "uint32_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "x0",
+        "desc": "GRID 的 x 范围的起点。",
+        "type": "float_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "x1",
+        "desc": "GRID 的 x 范围的终点。",
+        "type": "float_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "y0",
+        "desc": "GRID 的 y 范围的起点。",
+        "type": "float_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "y1",
+        "desc": "GRID 的 y 范围的终点。",
+        "type": "float_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "has_color",
+        "desc": "只对 POINTS 有意义：为 TRUE 表示点已自带颜色（如 csv 数据源），核心不再计算配色。",
+        "type": "bool_t",
+        "annotation": {
+          "readable": true
+        }
+      }
+    ],
+    "header": "source/plot3d_source.h",
+    "desc": "数据源的采样结果。",
+    "name": "plot3d_source_result_t",
+    "level": 1
+  },
+  {
+    "type": "class",
+    "methods": [
+      {
+        "params": [
+          {
+            "type": "plot3d_source_result_t*",
+            "name": "result",
+            "desc": "采样结果对象。"
+          },
+          {
+            "type": "darray_t*",
+            "name": "points",
+            "desc": "用于装数据点的数组，由核心提供且需已清空；"
+          }
+        ],
+        "annotation": {},
+        "desc": "初始化采样结果：全部字段清零，再把 points 挂上去。\n\n核心必须在每次调用 plot3d_source_sample 之前调用本函数，插件因此不必清理与自己产出形态\n无关的字段，也不会读到上一次采样（可能来自另一个形态）残留的 zs/has_color 等值。\n\n只产出 GRID 的数据源可以传 NULL。",
+        "name": "plot3d_source_result_init",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "plot3d_source_t*",
+            "name": "source",
+            "desc": "数据源对象。"
+          },
+          {
+            "type": "plot3d_source_result_t*",
+            "name": "result",
+            "desc": "返回采样结果。"
+          }
+        ],
+        "annotation": {},
+        "desc": "采样数据源的数据。调用之前 result 须已由 plot3d_source_result_init 初始化。",
+        "name": "plot3d_source_sample",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "plot3d_source_t*",
+            "name": "source",
+            "desc": "数据源对象。"
+          },
+          {
+            "type": "const char*",
+            "name": "name",
+            "desc": "属性名。"
+          },
+          {
+            "type": "const value_t*",
+            "name": "v",
+            "desc": "属性值。"
+          }
+        ],
+        "annotation": {},
+        "desc": "设置数据源的属性。\n\n非法（原值不变），RET_NOT_FOUND表示数据源不认识该属性。核心的属性广播依赖这\n三个返回值区分「认领并接受」「认领但拒绝」「未认领」。",
+        "name": "plot3d_source_set_prop",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示数据源认领该属性且值合法，RET_BAD_PARAMS表示认领该属性但值"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "plot3d_source_t*",
+            "name": "source",
+            "desc": "数据源对象。"
+          },
+          {
+            "type": "const char*",
+            "name": "name",
+            "desc": "属性名。"
+          },
+          {
+            "type": "value_t*",
+            "name": "v",
+            "desc": "返回属性值。"
+          }
+        ],
+        "annotation": {},
+        "desc": "获取数据源的属性。",
+        "name": "plot3d_source_get_prop",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，RET_NOT_FOUND表示数据源不认识该属性。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "plot3d_source_t*",
+            "name": "source",
+            "desc": "数据源对象。"
+          },
+          {
+            "type": "const char*",
+            "name": "name",
+            "desc": "数据名。"
+          },
+          {
+            "type": "void*",
+            "name": "p1",
+            "desc": "第一个参数，含义与所有权由该数据源声明。"
+          },
+          {
+            "type": "void*",
+            "name": "p2",
+            "desc": "第二个参数，含义与所有权由该数据源声明。"
+          }
+        ],
+        "annotation": {},
+        "desc": "给数据源设置回调函数、ctx、C 数组等 value_t 不便表达的数据。\n\nname 沿用 kebab-case，与属性名保持同一套命名。\n\n所有权总则：数据由调用方提供，**由插件决定是拷贝还是借用**，因此每个 name 都要有一个\nPLOT3D_SOURCE_DATA_* 宏，并在该宏的注释里写明自己的 p1/p2 含义与所有权（拷贝还是借用；\n借用时还要写明调用方需要维持数据有效的期限）。调用方只能依据该宏的注释来管理这块数据的生命\n周期。约定只在宏注释里写一份，本总则不再逐个复述，免得两处描述分叉。",
+        "name": "plot3d_source_set_data",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，RET_NOT_FOUND表示数据源不认识该数据名。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "plot3d_source_t*",
+            "name": "source",
+            "desc": "数据源对象。"
+          }
+        ],
+        "annotation": {},
+        "desc": "判断数据源是否已被喂入可用的数据。",
+        "name": "plot3d_source_has_data",
+        "return": {
+          "type": "bool_t",
+          "desc": "返回TRUE表示有数据，否则表示没有。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "plot3d_source_t*",
+            "name": "source",
+            "desc": "数据源对象。"
+          }
+        ],
+        "annotation": {},
+        "desc": "清空数据源的数据，用于让位于其它数据源或 dataset。",
+        "name": "plot3d_source_reset",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "plot3d_source_t*",
+            "name": "source",
+            "desc": "数据源对象。"
+          }
+        ],
+        "annotation": {},
+        "desc": "销毁数据源对象。",
+        "name": "plot3d_source_destroy",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "char**",
+            "name": "text",
+            "desc": "存放该属性的字段，值合法时被改写成 value 的副本。"
+          },
+          {
+            "type": "const char*",
+            "name": "value",
+            "desc": "形如 \"0,360\"；为空表示不指定，此时字段被清空。"
+          }
+        ],
+        "annotation": {},
+        "desc": "校验并落值一个 \"min,max\" 形式的范围属性。\n\n属性两阶段迁移期间，同一个范围属性会同时有核心与插件两个持有者，而阶段一的转发只在插件拒绝了\n核心已接受的值时告警、并不回滚，其正确性完全建立在「双方用同一套校验」之上。因此两边都必须调\n本函数，不要各抄一份。",
+        "name": "plot3d_source_set_range_prop",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，格式非法时返回RET_BAD_PARAMS且字段保持原值。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "const plot3d_source_vtable_t*",
+            "name": "vt",
+            "desc": "数据源的虚函数表，需要在注册期间一直有效，"
+          }
+        ],
+        "annotation": {},
+        "desc": "注册数据源插件，type 相同时替换原有的插件，以便用户用自己的实现覆盖内置插件。\n其 type/create/destroy 三个成员不能为 NULL。",
+        "name": "plot3d_source_factory_register",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "const char*",
+            "name": "type",
+            "desc": "数据源的类型名。"
+          }
+        ],
+        "annotation": {},
+        "desc": "创建指定类型的数据源对象。",
+        "name": "plot3d_source_factory_create",
+        "return": {
+          "type": "plot3d_source_t*",
+          "desc": "返回数据源对象，类型未注册时返回NULL。"
+        }
+      },
+      {
+        "params": [],
+        "annotation": {},
+        "desc": "获取已注册的数据源插件的个数。",
+        "name": "plot3d_source_factory_count",
+        "return": {
+          "type": "uint32_t",
+          "desc": "返回已注册的插件个数。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "uint32_t",
+            "name": "index",
+            "desc": "序号。"
+          }
+        ],
+        "annotation": {},
+        "desc": "获取指定序号的数据源插件的虚函数表。",
+        "name": "plot3d_source_factory_get",
+        "return": {
+          "type": "const plot3d_source_vtable_t*",
+          "desc": "返回虚函数表，序号无效时返回NULL。"
+        }
+      },
+      {
+        "params": [],
+        "annotation": {},
+        "desc": "清空数据源注册表，重复调用是安全的。",
+        "name": "plot3d_source_factory_deinit",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      }
+    ],
+    "events": [],
+    "properties": [],
+    "header": "source/plot3d_source.h",
+    "desc": "数据源插件的实例，各插件把它作为自己结构体的第一个成员。",
+    "name": "plot3d_source_t",
+    "level": 1
+  },
+  {
+    "params": [],
+    "annotation": {
+      "global": true
+    },
+    "desc": "注册 csv 数据源插件（类型名 \"none\"，与采样模式同名）。",
+    "name": "plot3d_source_csv_register",
+    "return": {
+      "type": "ret_t",
+      "desc": "返回RET_OK表示成功，否则表示失败。"
+    },
+    "type": "method",
+    "header": "source/plot3d_source.h",
+    "level": 1
+  },
+  {
+    "params": [],
+    "annotation": {
+      "global": true
+    },
+    "desc": "注册矩阵数据源插件（类型名 \"matrix\"，与采样模式同名）。",
+    "name": "plot3d_source_matrix_register",
+    "return": {
+      "type": "ret_t",
+      "desc": "返回RET_OK表示成功，否则表示失败。"
+    },
+    "type": "method",
+    "header": "source/plot3d_source.h",
+    "level": 1
+  },
+  {
+    "params": [],
+    "annotation": {
+      "global": true
+    },
+    "desc": "注册曲线数据源插件（类型名 \"curve\"，与采样模式同名）。",
+    "name": "plot3d_source_curve_register",
+    "return": {
+      "type": "ret_t",
+      "desc": "返回RET_OK表示成功，否则表示失败。"
+    },
+    "type": "method",
+    "header": "source/plot3d_source.h",
+    "level": 1
+  },
+  {
+    "params": [],
+    "annotation": {
+      "global": true
+    },
+    "desc": "注册网格数据源插件（类型名 \"grid\"，与采样模式同名）。",
+    "name": "plot3d_source_grid_register",
+    "return": {
+      "type": "ret_t",
+      "desc": "返回RET_OK表示成功，否则表示失败。"
+    },
+    "type": "method",
+    "header": "source/plot3d_source.h",
+    "level": 1
+  },
+  {
+    "type": "class",
+    "methods": [],
+    "events": [],
+    "properties": [
+      {
+        "name": "cols",
+        "desc": "列数。",
+        "type": "uint32_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "rows",
+        "desc": "行数。",
+        "type": "uint32_t",
+        "annotation": {
+          "readable": true
+        }
+      }
+    ],
+    "header": "source/plot3d_source.h",
+    "desc": "matrix 数据源的矩阵形状，作为 PLOT3D_SOURCE_DATA_Z_MATRIX 的 p2 传入。",
+    "name": "plot3d_source_matrix_size_t",
+    "level": 1
+  },
+  {
+    "type": "class",
+    "methods": [],
+    "events": [],
+    "properties": [
+      {
+        "name": "x",
+        "desc": "原始 X 坐标。",
+        "type": "float_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "y",
+        "desc": "原始 Y 坐标。",
+        "type": "float_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "z",
+        "desc": "原始 Z 坐标。",
+        "type": "float_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "sx",
+        "desc": "屏幕 X 坐标。",
+        "type": "float_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "sy",
+        "desc": "屏幕 Y 坐标。",
+        "type": "float_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "rx",
+        "desc": "旋转后的 X，供法线与光照计算。",
+        "type": "float_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "ry",
+        "desc": "旋转后的 Y，供法线与光照计算。",
+        "type": "float_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "rz",
+        "desc": "旋转后的 Z，供法线与光照计算。",
+        "type": "float_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "depth",
+        "desc": "深度，供图元排序。",
+        "type": "float_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "color",
+        "desc": "点颜色。",
+        "type": "color_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "is_break",
+        "desc": "是否为折线分段点。",
+        "type": "bool_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "valid",
+        "desc": "是否参与绘制；为 FALSE 时被剔除。",
+        "type": "bool_t",
+        "annotation": {
+          "readable": true
+        }
+      }
+    ],
+    "header": "type/plot3d_type.h",
+    "desc": "@prefix plot3d_projected_point\n投影后的三维点。build 的输入必须是这类点，而不是原始数据点。",
+    "name": "plot3d_projected_point_t",
+    "level": 1
+  },
+  {
+    "type": "enum",
+    "desc": "图元类型。",
+    "consts": [],
+    "header": "type/plot3d_type.h",
+    "name": "plot3d_primitive_type_t",
+    "prefix": "PLOT3D_PRIMITIVE",
+    "level": 1
+  },
+  {
+    "type": "class",
+    "methods": [],
+    "events": [],
+    "properties": [],
+    "header": "type/plot3d_type.h",
+    "desc": "@prefix plot3d_primitive\n投影图元，i0/i1/i2 为投影点数组下标。",
+    "name": "plot3d_primitive_t",
+    "level": 1
+  },
+  {
+    "type": "class",
+    "methods": [],
+    "events": [],
+    "properties": [
+      {
+        "name": "points",
+        "desc": "投影后的点数组；build 只应读它，不得改写。",
+        "type": "const plot3d_projected_point_t*",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "points_nr",
+        "desc": "投影点个数。",
+        "type": "uint32_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "point_size",
+        "desc": "点大小。",
+        "type": "float_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "line_width",
+        "desc": "线宽。",
+        "type": "float_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "colormap",
+        "desc": "配色表名。",
+        "type": "const char*",
+        "annotation": {
+          "readable": true
+        }
+      }
+    ],
+    "header": "type/plot3d_type.h",
+    "desc": "@prefix plot3d_paint_ctx\n图型插件绘制时的上下文。\n\n约束（下期迁移实现时必须遵守）：\n1. build 的输入是**投影后**的点（rx/ry/rz/depth/valid），不是原始数据点——核心用它们\n算法线、排序与剔除。\n2. layout_grid 只产坐标与拓扑，颜色由核心按网格节点下标回填（surface 展开的 6 个顶点必须\n复用同一节点颜色）。\n3. on_paint 为 NULL 时走核心标准流程，非 NULL 时插件整体接管绘制。",
+    "name": "plot3d_paint_ctx_t",
+    "level": 1
+  },
+  {
+    "type": "class",
+    "methods": [
+      {
+        "params": [
+          {
+            "type": "plot3d_type_t*",
+            "name": "type",
+            "desc": "图型对象。"
+          },
+          {
+            "type": "const plot3d_paint_ctx_t*",
+            "name": "ctx",
+            "desc": "绘制上下文。"
+          },
+          {
+            "type": "const plot3d_source_result_t*",
+            "name": "result",
+            "desc": "GRID 采样结果。"
+          },
+          {
+            "type": "darray_t*",
+            "name": "points",
+            "desc": "返回数据点，由核心提供且需已清空。"
+          }
+        ],
+        "annotation": {},
+        "desc": "把 GRID 采样结果铺成数据点（含拓扑）。",
+        "name": "plot3d_type_layout_grid",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "plot3d_type_t*",
+            "name": "type",
+            "desc": "图型对象。"
+          },
+          {
+            "type": "const plot3d_paint_ctx_t*",
+            "name": "ctx",
+            "desc": "绘制上下文（含投影点）。"
+          },
+          {
+            "type": "darray_t*",
+            "name": "primitives",
+            "desc": "返回图元，由核心提供且需已清空。"
+          }
+        ],
+        "annotation": {},
+        "desc": "从投影后的点数组构建图元。",
+        "name": "plot3d_type_build",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "darray_t*",
+            "name": "primitives",
+            "desc": "图元数组。"
+          },
+          {
+            "type": "plot3d_primitive_type_t",
+            "name": "type",
+            "desc": "图元类型。"
+          },
+          {
+            "type": "uint32_t",
+            "name": "i0",
+            "desc": "第一个顶点下标。"
+          },
+          {
+            "type": "uint32_t",
+            "name": "i1",
+            "desc": "第二个顶点下标。"
+          },
+          {
+            "type": "uint32_t",
+            "name": "i2",
+            "desc": "第三个顶点下标。"
+          },
+          {
+            "type": "float_t",
+            "name": "depth",
+            "desc": "排序深度。"
+          },
+          {
+            "type": "color_t",
+            "name": "color",
+            "desc": "图元颜色。"
+          }
+        ],
+        "annotation": {},
+        "desc": "向图元数组追加一个图元。供图型插件 build 复用，数组元素由 darray 的 destroy 回调释放。",
+        "name": "plot3d_type_push_primitive",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "plot3d_type_t*",
+            "name": "type",
+            "desc": "图型对象。"
+          },
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "控件。"
+          },
+          {
+            "type": "canvas_t*",
+            "name": "c",
+            "desc": "画布。"
+          }
+        ],
+        "annotation": {},
+        "desc": "插件整体接管绘制。vtable 中 on_paint 为 NULL 时不应调用本函数，应走核心标准流程。",
+        "name": "plot3d_type_on_paint",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "plot3d_type_t*",
+            "name": "type",
+            "desc": "图型对象。"
+          },
+          {
+            "type": "const char*",
+            "name": "name",
+            "desc": "属性名。"
+          },
+          {
+            "type": "const value_t*",
+            "name": "v",
+            "desc": "属性值。"
+          }
+        ],
+        "annotation": {},
+        "desc": "设置图型插件的属性。\n\n非法（原值不变），RET_NOT_FOUND表示插件不认识该属性。核心的属性广播依赖这\n三个返回值区分「认领并接受」「认领但拒绝」「未认领」。",
+        "name": "plot3d_type_set_prop",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示插件认领该属性且值合法，RET_BAD_PARAMS表示认领该属性但值"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "plot3d_type_t*",
+            "name": "type",
+            "desc": "图型对象。"
+          },
+          {
+            "type": "const char*",
+            "name": "name",
+            "desc": "属性名。"
+          },
+          {
+            "type": "value_t*",
+            "name": "v",
+            "desc": "返回属性值。"
+          }
+        ],
+        "annotation": {},
+        "desc": "获取图型插件的属性。",
+        "name": "plot3d_type_get_prop",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，RET_NOT_FOUND表示插件不认识该属性。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "plot3d_type_t*",
+            "name": "type",
+            "desc": "图型对象。"
+          }
+        ],
+        "annotation": {},
+        "desc": "初始化图型共用的 point_size / line_width 默认值。插件 create 时应调用。",
+        "name": "plot3d_type_init_style",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "plot3d_type_t*",
+            "name": "type",
+            "desc": "图型对象。"
+          },
+          {
+            "type": "const char*",
+            "name": "name",
+            "desc": "属性名。"
+          },
+          {
+            "type": "const value_t*",
+            "name": "v",
+            "desc": "属性值。"
+          }
+        ],
+        "annotation": {},
+        "desc": "设置图型共用的 point_size / line_width。供插件 set_prop 复用；其它属性返回 RET_NOT_FOUND。",
+        "name": "plot3d_type_set_style_prop",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示认领并接受，RET_NOT_FOUND表示不是样式属性。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "plot3d_type_t*",
+            "name": "type",
+            "desc": "图型对象。"
+          },
+          {
+            "type": "const char*",
+            "name": "name",
+            "desc": "属性名。"
+          },
+          {
+            "type": "value_t*",
+            "name": "v",
+            "desc": "返回属性值。"
+          }
+        ],
+        "annotation": {},
+        "desc": "读取图型共用的 point_size / line_width。供插件 get_prop 复用；其它属性返回 RET_NOT_FOUND。",
+        "name": "plot3d_type_get_style_prop",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，RET_NOT_FOUND表示不是样式属性。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "plot3d_type_t*",
+            "name": "type",
+            "desc": "图型对象。"
+          }
+        ],
+        "annotation": {},
+        "desc": "销毁图型插件对象。",
+        "name": "plot3d_type_destroy",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "const plot3d_type_vtable_t*",
+            "name": "vt",
+            "desc": "图型插件的虚函数表，需要在注册期间一直有效，"
+          }
+        ],
+        "annotation": {},
+        "desc": "注册图型插件，type 相同时替换原有的插件，以便用户用自己的实现覆盖内置插件。\n其 type/create/destroy 三个成员不能为 NULL。",
+        "name": "plot3d_type_factory_register",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "const char*",
+            "name": "type",
+            "desc": "图型的类型名。"
+          }
+        ],
+        "annotation": {},
+        "desc": "创建指定类型的图型插件对象。",
+        "name": "plot3d_type_factory_create",
+        "return": {
+          "type": "plot3d_type_t*",
+          "desc": "返回图型对象，类型未注册时返回NULL。"
+        }
+      },
+      {
+        "params": [],
+        "annotation": {},
+        "desc": "获取已注册的图型插件的个数。",
+        "name": "plot3d_type_factory_count",
+        "return": {
+          "type": "uint32_t",
+          "desc": "返回已注册的插件个数。"
+        }
+      },
+      {
+        "params": [
+          {
+            "type": "uint32_t",
+            "name": "index",
+            "desc": "序号。"
+          }
+        ],
+        "annotation": {},
+        "desc": "获取指定序号的图型插件的虚函数表。",
+        "name": "plot3d_type_factory_get",
+        "return": {
+          "type": "const plot3d_type_vtable_t*",
+          "desc": "返回虚函数表，序号无效时返回NULL。"
+        }
+      },
+      {
+        "params": [],
+        "annotation": {},
+        "desc": "清空图型插件注册表，重复调用是安全的。",
+        "name": "plot3d_type_factory_deinit",
+        "return": {
+          "type": "ret_t",
+          "desc": "返回RET_OK表示成功，否则表示失败。"
+        }
+      }
+    ],
+    "events": [],
+    "properties": [],
+    "header": "type/plot3d_type.h",
+    "desc": "图型插件的实例，各插件把它作为自己结构体的第一个成员。\n\npoint_size / line_width 放在基类：内置图型共用同一套视觉属性，避免每个插件复制一份。",
+    "name": "plot3d_type_t",
+    "level": 1
+  },
+  {
+    "params": [],
+    "annotation": {
+      "global": true
+    },
+    "desc": "注册内置的 line 图型插件。",
+    "name": "plot3d_type_line_register",
+    "return": {
+      "type": "ret_t",
+      "desc": "返回RET_OK表示成功，否则表示失败。"
+    },
+    "type": "method",
+    "header": "type/plot3d_type.h",
+    "level": 1
+  },
+  {
+    "params": [],
+    "annotation": {
+      "global": true
+    },
+    "desc": "注册内置的 dot 图型插件。",
+    "name": "plot3d_type_dot_register",
+    "return": {
+      "type": "ret_t",
+      "desc": "返回RET_OK表示成功，否则表示失败。"
+    },
+    "type": "method",
+    "header": "type/plot3d_type.h",
+    "level": 1
+  },
+  {
+    "params": [],
+    "annotation": {
+      "global": true
+    },
+    "desc": "注册内置的 surface 图型插件。",
+    "name": "plot3d_type_surface_register",
+    "return": {
+      "type": "ret_t",
+      "desc": "返回RET_OK表示成功，否则表示失败。"
+    },
+    "type": "method",
+    "header": "type/plot3d_type.h",
+    "level": 1
+  },
+  {
+    "params": [],
+    "annotation": {
+      "global": true
+    },
+    "desc": "注册内置的 cylinder 图型插件。",
+    "name": "plot3d_type_cylinder_register",
+    "return": {
+      "type": "ret_t",
+      "desc": "返回RET_OK表示成功，否则表示失败。"
+    },
+    "type": "method",
+    "header": "type/plot3d_type.h",
+    "level": 1
+  },
+  {
+    "type": "class",
+    "methods": [
+      {
+        "params": [],
+        "annotation": {},
+        "desc": "获取 plot3d 虚表。",
+        "name": "plot3d_get_widget_vtable",
+        "return": {
+          "type": "const widget_vtable_t*",
+          "desc": "成功返回 plot3d 虚表。"
+        }
+      }
+    ],
+    "events": [],
+    "properties": [
+      {
+        "name": "plottype",
+        "desc": "chart type: dot,line,surface,cylinder。",
+        "type": "char*",
+        "annotation": {
+          "set_prop": true,
+          "get_prop": true,
+          "readable": true,
+          "persitent": true,
+          "design": true,
+          "scriptable": true
+        }
+      },
+      {
+        "name": "sample_mode",
+        "desc": "函数采样模式：none 用 dataset 的数据，grid 用 z=f(x,y) 采样，curve 用参数 t 采样曲线，\nmatrix 用现成的 z 矩阵。",
+        "type": "char*",
+        "annotation": {
+          "set_prop": true,
+          "get_prop": true,
+          "readable": true,
+          "persitent": true,
+          "design": true,
+          "scriptable": true
+        }
+      },
+      {
+        "name": "colormap",
+        "desc": "函数采样点的配色表：viridis,jet,gray,parula,hot,cool,hsv,bone,copper,pink,turbo。",
+        "type": "char*",
+        "annotation": {
+          "set_prop": true,
+          "get_prop": true,
+          "readable": true,
+          "persitent": true,
+          "design": true,
+          "scriptable": true
+        }
+      },
+      {
+        "name": "xlabel",
+        "desc": "X 轴名称。",
+        "type": "char*",
+        "annotation": {
+          "set_prop": true,
+          "get_prop": true,
+          "readable": true,
+          "persitent": true,
+          "design": true,
+          "scriptable": true
+        }
+      },
+      {
+        "name": "ylabel",
+        "desc": "Y 轴名称。",
+        "type": "char*",
+        "annotation": {
+          "set_prop": true,
+          "get_prop": true,
+          "readable": true,
+          "persitent": true,
+          "design": true,
+          "scriptable": true
+        }
+      },
+      {
+        "name": "zlabel",
+        "desc": "Z 轴名称。",
+        "type": "char*",
+        "annotation": {
+          "set_prop": true,
+          "get_prop": true,
+          "readable": true,
+          "persitent": true,
+          "design": true,
+          "scriptable": true
+        }
+      },
+      {
+        "name": "grid_color_str",
+        "desc": "网格颜色字符串（对应属性名 grid_color）。",
+        "type": "char*",
+        "annotation": {
+          "set_prop": true,
+          "get_prop": true,
+          "readable": true,
+          "persitent": true,
+          "design": true,
+          "scriptable": true
+        }
+      },
+      {
+        "name": "xaxis_color_str",
+        "desc": "X 轴颜色字符串（对应属性名 xaxis-color）。",
+        "type": "char*",
+        "annotation": {
+          "set_prop": true,
+          "get_prop": true,
+          "readable": true,
+          "persitent": true,
+          "design": true,
+          "scriptable": true
+        }
+      },
+      {
+        "name": "yaxis_color_str",
+        "desc": "Y 轴颜色字符串（对应属性名 yaxis-color）。",
+        "type": "char*",
+        "annotation": {
+          "set_prop": true,
+          "get_prop": true,
+          "readable": true,
+          "persitent": true,
+          "design": true,
+          "scriptable": true
+        }
+      },
+      {
+        "name": "zaxis_color_str",
+        "desc": "Z 轴颜色字符串（对应属性名 zaxis-color）。",
+        "type": "char*",
+        "annotation": {
+          "set_prop": true,
+          "get_prop": true,
+          "readable": true,
+          "persitent": true,
+          "design": true,
+          "scriptable": true
+        }
+      },
+      {
+        "name": "tick_color_str",
+        "desc": "刻度文字颜色字符串（对应属性名 tick-color）。",
+        "type": "char*",
+        "annotation": {
+          "set_prop": true,
+          "get_prop": true,
+          "readable": true,
+          "persitent": true,
+          "design": true,
+          "scriptable": true
+        }
+      },
+      {
+        "name": "show_grid",
+        "desc": "是否显示网格。",
+        "type": "bool_t",
+        "annotation": {
+          "set_prop": true,
+          "get_prop": true,
+          "readable": true,
+          "persitent": true,
+          "design": true,
+          "scriptable": true
+        }
+      },
+      {
+        "name": "show_datatip",
+        "desc": "是否显示数据提示。",
+        "type": "bool_t",
+        "annotation": {
+          "set_prop": true,
+          "get_prop": true,
+          "readable": true,
+          "persitent": true,
+          "design": true,
+          "scriptable": true
+        }
+      },
+      {
+        "name": "show_axis_tick",
+        "desc": "是否显示轴刻度文字。",
+        "type": "bool_t",
+        "annotation": {
+          "set_prop": true,
+          "get_prop": true,
+          "readable": true,
+          "persitent": true,
+          "design": true,
+          "scriptable": true
+        }
+      },
+      {
+        "name": "enable_cache",
+        "desc": "是否启用投影/绘制缓存。",
+        "type": "bool_t",
+        "annotation": {
+          "set_prop": true,
+          "get_prop": true,
+          "readable": true,
+          "persitent": true,
+          "design": true,
+          "scriptable": true
+        }
+      },
+      {
+        "name": "equal_axis",
+        "desc": "是否三轴等比例（TRUE 时忽略 box-aspect）。",
+        "type": "bool_t",
+        "annotation": {
+          "set_prop": true,
+          "get_prop": true,
+          "readable": true,
+          "persitent": true,
+          "design": true,
+          "scriptable": true
+        }
+      },
+      {
+        "name": "camera_yaw",
+        "desc": "相机方位角（弧度）。",
+        "type": "float_t",
+        "annotation": {
+          "set_prop": true,
+          "get_prop": true,
+          "readable": true,
+          "persitent": true,
+          "design": true,
+          "scriptable": true
+        }
+      },
+      {
+        "name": "camera_pitch",
+        "desc": "相机俯仰角（弧度）。",
+        "type": "float_t",
+        "annotation": {
+          "set_prop": true,
+          "get_prop": true,
+          "readable": true,
+          "persitent": true,
+          "design": true,
+          "scriptable": true
+        }
+      },
+      {
+        "name": "camera_distance",
+        "desc": "相机距离。",
+        "type": "float_t",
+        "annotation": {
+          "set_prop": true,
+          "get_prop": true,
+          "readable": true,
+          "persitent": true,
+          "design": true,
+          "scriptable": true
+        }
+      },
+      {
+        "name": "camera_z_offset",
+        "desc": "相机沿 Z 方向偏移。",
+        "type": "float_t",
+        "annotation": {
+          "set_prop": true,
+          "get_prop": true,
+          "readable": true,
+          "persitent": true,
+          "design": true,
+          "scriptable": true
+        }
+      },
+      {
+        "name": "xy_grid_position",
+        "desc": "XY 网格平面在 Z 轴上的位置。",
+        "type": "float_t",
+        "annotation": {
+          "set_prop": true,
+          "get_prop": true,
+          "readable": true,
+          "persitent": true,
+          "design": true,
+          "scriptable": true
+        }
+      },
+      {
+        "name": "xz_grid_position",
+        "desc": "XZ 网格平面在 Y 轴上的位置。",
+        "type": "float_t",
+        "annotation": {
+          "set_prop": true,
+          "get_prop": true,
+          "readable": true,
+          "persitent": true,
+          "design": true,
+          "scriptable": true
+        }
+      },
+      {
+        "name": "yz_grid_position",
+        "desc": "YZ 网格平面在 X 轴上的位置。",
+        "type": "float_t",
+        "annotation": {
+          "set_prop": true,
+          "get_prop": true,
+          "readable": true,
+          "persitent": true,
+          "design": true,
+          "scriptable": true
+        }
+      },
+      {
+        "name": "box_aspect_x",
+        "desc": "包围盒 X 边相对长度系数。",
+        "type": "float_t",
+        "annotation": {
+          "set_prop": true,
+          "get_prop": true,
+          "readable": true,
+          "persitent": true,
+          "design": true,
+          "scriptable": true
+        }
+      },
+      {
+        "name": "box_aspect_y",
+        "desc": "包围盒 Y 边相对长度系数。",
+        "type": "float_t",
+        "annotation": {
+          "set_prop": true,
+          "get_prop": true,
+          "readable": true,
+          "persitent": true,
+          "design": true,
+          "scriptable": true
+        }
+      },
+      {
+        "name": "box_aspect_z",
+        "desc": "包围盒 Z 边相对长度系数。",
+        "type": "float_t",
+        "annotation": {
+          "set_prop": true,
+          "get_prop": true,
+          "readable": true,
+          "persitent": true,
+          "design": true,
+          "scriptable": true
+        }
+      },
+      {
+        "name": "x_grid_count",
+        "desc": "X 轴网格格数上限。",
+        "type": "uint32_t",
+        "annotation": {
+          "set_prop": true,
+          "get_prop": true,
+          "readable": true,
+          "persitent": true,
+          "design": true,
+          "scriptable": true
+        }
+      },
+      {
+        "name": "y_grid_count",
+        "desc": "Y 轴网格格数上限。",
+        "type": "uint32_t",
+        "annotation": {
+          "set_prop": true,
+          "get_prop": true,
+          "readable": true,
+          "persitent": true,
+          "design": true,
+          "scriptable": true
+        }
+      },
+      {
+        "name": "z_grid_count",
+        "desc": "Z 轴网格格数上限。",
+        "type": "uint32_t",
+        "annotation": {
+          "set_prop": true,
+          "get_prop": true,
+          "readable": true,
+          "persitent": true,
+          "design": true,
+          "scriptable": true
+        }
+      },
+      {
+        "name": "grid_color",
+        "desc": "网格颜色（由 grid_color 字符串解析得到）。",
+        "type": "color_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "xaxis_color",
+        "desc": "X 轴颜色（由 xaxis-color 字符串解析得到）。",
+        "type": "color_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "yaxis_color",
+        "desc": "Y 轴颜色（由 yaxis-color 字符串解析得到）。",
+        "type": "color_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "zaxis_color",
+        "desc": "Z 轴颜色（由 zaxis-color 字符串解析得到）。",
+        "type": "color_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "tick_color",
+        "desc": "刻度文字颜色（由 tick-color 字符串解析得到）。",
+        "type": "color_t",
+        "annotation": {
+          "readable": true
+        }
+      },
+      {
+        "name": "axis_negative_brightness",
+        "desc": "负半轴相对正半轴的亮度系数。",
+        "type": "float_t",
+        "annotation": {
+          "set_prop": true,
+          "get_prop": true,
+          "readable": true,
+          "persitent": true,
+          "design": true,
+          "scriptable": true
+        }
+      }
+    ],
+    "header": "plot3d/plot3d.h",
+    "desc": "Plot3D 三维图表控件。\n\nplot3d\\_t是[widget\\_t](widget_t.md)的子类控件，widget\\_t的函数均适用于plot3d\\_t控件。\n\n在xml中使用\"plot3d\"标签创建控件。如：\n\n```xml\n<!-- ui -->\n<plot3d x=\"c\" y=\"50\" w=\"100\" h=\"100\"/>\n```\n\n可用通过style来设置控件的显示风格，如字体的大小和颜色等等。如：\n\n```xml\n<!-- style -->\n<plot3d>\n<style name=\"default\" font_size=\"32\">\n<normal text_color=\"black\" />\n</style>\n</plot3d>\n```",
+    "name": "plot3d_t",
+    "parent": "widget_t",
+    "annotation": {
+      "scriptable": true,
+      "design": true,
+      "widget": true
+    },
+    "level": 2
+  }
+]

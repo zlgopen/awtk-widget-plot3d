@@ -1,0 +1,33 @@
+<window theme="main">
+  <plot3d name="chart" x="0" y="0" w="100%" h="58%"/>
+  <tab_control x="0" y="b:0" w="100%" h="42%" children_layout="default(r=0,c=1,s=0)">
+    <tab_button_group h="32" compact="true" scrollable="true">
+      <tab_button value="true" text="Data"/>
+      <tab_button text="PlotType"/>
+      <tab_button text="Appearance"/>
+      <tab_button text="GridAxis"/>
+      <tab_button text="Camera"/>
+    </tab_button_group>
+    <pages h="-32">
+      <scroll_view w="100%" h="100%">
+        <view x="8" y="4" w="-16" h="36" children_layout="default(row=1,col=4,s=4)">
+          <label text="Dataset"/>
+          <combo_box name="cb_preset" readonly="true" options="SinSurface" selected_index="0"/>
+          <label name="lbl_sample_info" text=""/>
+        </view>
+      </scroll_view>
+      <scroll_view w="100%" h="100%">
+        <view name="slot_plot_type" x="8" y="4" w="-16" h="36"/>
+      </scroll_view>
+      <scroll_view w="100%" h="100%">
+        <view name="slot_appearance" x="8" y="4" w="-16" h="156"/>
+      </scroll_view>
+      <scroll_view w="100%" h="100%">
+        <view name="slot_grid_axis" x="8" y="4" w="-16" h="116"/>
+      </scroll_view>
+      <scroll_view w="100%" h="100%">
+        <view name="slot_camera" x="8" y="4" w="-16" h="36"/>
+      </scroll_view>
+    </pages>
+  </tab_control>
+</window>
