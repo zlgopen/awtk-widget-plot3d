@@ -191,10 +191,16 @@ ret_t plot3d_draw_grid_and_axis(widget_t* widget, canvas_t* c, const plot3d_boun
   return_value_if_fail(plot3d != NULL && bounds != NULL, RET_BAD_PARAMS);
   return_value_if_fail(vg != NULL, RET_OK);
 
-  /* 轴范围按整齐刻度规整后可能不再包含 0，网格面要贴到最近的一个面上，不能飘在盒子外面。 */
-  origin[PLOT3D_AXIS_X] = tk_max(bounds->min_x, tk_min(bounds->max_x, plot3d->yz_grid_position));
-  origin[PLOT3D_AXIS_Y] = tk_max(bounds->min_y, tk_min(bounds->max_y, plot3d->xz_grid_position));
-  origin[PLOT3D_AXIS_Z] = tk_max(bounds->min_z, tk_min(bounds->max_z, plot3d->xy_grid_position));
+  /* 轴范围按整齐刻度规整后可能不再包含 0，网格面按网格序号对齐到等分位置。 */
+  origin[PLOT3D_AXIS_X] =
+      plot3d_axis_value_at_grid_index(bounds->min_x, bounds->max_x, bounds->count_x,
+                                      plot3d->yz_grid_position);
+  origin[PLOT3D_AXIS_Y] =
+      plot3d_axis_value_at_grid_index(bounds->min_y, bounds->max_y, bounds->count_y,
+                                      plot3d->xz_grid_position);
+  origin[PLOT3D_AXIS_Z] =
+      plot3d_axis_value_at_grid_index(bounds->min_z, bounds->max_z, bounds->count_z,
+                                      plot3d->xy_grid_position);
 
   axis_colors[PLOT3D_AXIS_X] = plot3d->xaxis_color;
   axis_colors[PLOT3D_AXIS_Y] = plot3d->yaxis_color;

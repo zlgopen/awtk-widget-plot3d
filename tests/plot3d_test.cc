@@ -1,6 +1,7 @@
 ﻿#include <math.h>
 
 #include "plot3d/plot3d.h"
+#include "plot3d/plot3d_scene.h"
 #include "gtest/gtest.h"
 #include "tkc/color_parser.h"
 #include "awtk.h"
@@ -291,45 +292,51 @@ TEST(plot3d, grid_position_props) {
 
   value_reset(&v);
   ASSERT_EQ(RET_OK, widget_get_prop(w, PLOT3D_PROP_XY_GRID_POSITION, &v));
-  ASSERT_NEAR(0.0f, value_float32(&v), 0.001f);
+  ASSERT_EQ(0u, (uint32_t)value_uint32(&v));
   value_reset(&v);
   ASSERT_EQ(RET_OK, widget_get_prop(w, PLOT3D_PROP_XZ_GRID_POSITION, &v));
-  ASSERT_NEAR(0.0f, value_float32(&v), 0.001f);
+  ASSERT_EQ(0u, (uint32_t)value_uint32(&v));
   value_reset(&v);
   ASSERT_EQ(RET_OK, widget_get_prop(w, PLOT3D_PROP_YZ_GRID_POSITION, &v));
-  ASSERT_NEAR(0.0f, value_float32(&v), 0.001f);
+  ASSERT_EQ(0u, (uint32_t)value_uint32(&v));
   value_reset(&v);
 
-  ASSERT_EQ(RET_OK, plot3d_set_xy_grid_position(w, 1.5f));
-  ASSERT_EQ(RET_OK, plot3d_set_xz_grid_position(w, -0.5f));
-  ASSERT_EQ(RET_OK, plot3d_set_yz_grid_position(w, 2.0f));
+  ASSERT_EQ(RET_OK, plot3d_set_xy_grid_position(w, 3));
+  ASSERT_EQ(RET_OK, plot3d_set_xz_grid_position(w, 2));
+  ASSERT_EQ(RET_OK, plot3d_set_yz_grid_position(w, 4));
 
   ASSERT_EQ(RET_OK, widget_get_prop(w, PLOT3D_PROP_XY_GRID_POSITION, &v));
-  ASSERT_NEAR(1.5f, value_float32(&v), 0.001f);
-  value_reset(&v);
-  ASSERT_EQ(RET_OK, widget_get_prop(w, PLOT3D_PROP_XZ_GRID_POSITION, &v));
-  ASSERT_NEAR(-0.5f, value_float32(&v), 0.001f);
-  value_reset(&v);
-  ASSERT_EQ(RET_OK, widget_get_prop(w, PLOT3D_PROP_YZ_GRID_POSITION, &v));
-  ASSERT_NEAR(2.0f, value_float32(&v), 0.001f);
+  ASSERT_EQ(3u, (uint32_t)value_uint32(&v));
   value_reset(&v);
 
-  ASSERT_EQ(RET_OK, widget_set_prop_float(w, PLOT3D_PROP_XY_GRID_POSITION, 3.0f));
+  ASSERT_EQ(RET_OK, plot3d_set_xy_grid_position(w, 100));
   ASSERT_EQ(RET_OK, widget_get_prop(w, PLOT3D_PROP_XY_GRID_POSITION, &v));
-  ASSERT_NEAR(3.0f, value_float32(&v), 0.001f);
+  ASSERT_EQ(50u, (uint32_t)value_uint32(&v));
   value_reset(&v);
 
-  ASSERT_EQ(RET_OK, widget_set_prop_float(w, PLOT3D_PROP_XZ_GRID_POSITION, 4.0f));
+  /* 旧浮点字符串/float：截断 */
+  ASSERT_EQ(RET_OK, widget_set_prop_float(w, PLOT3D_PROP_XY_GRID_POSITION, 1.9f));
+  ASSERT_EQ(RET_OK, widget_get_prop(w, PLOT3D_PROP_XY_GRID_POSITION, &v));
+  ASSERT_EQ(1u, (uint32_t)value_uint32(&v));
+  value_reset(&v);
+
+  ASSERT_EQ(RET_OK, widget_set_prop_int(w, PLOT3D_PROP_XZ_GRID_POSITION, -3));
   ASSERT_EQ(RET_OK, widget_get_prop(w, PLOT3D_PROP_XZ_GRID_POSITION, &v));
-  ASSERT_NEAR(4.0f, value_float32(&v), 0.001f);
-  value_reset(&v);
-
-  ASSERT_EQ(RET_OK, widget_set_prop_float(w, PLOT3D_PROP_YZ_GRID_POSITION, 5.0f));
-  ASSERT_EQ(RET_OK, widget_get_prop(w, PLOT3D_PROP_YZ_GRID_POSITION, &v));
-  ASSERT_NEAR(5.0f, value_float32(&v), 0.001f);
+  ASSERT_EQ(0u, (uint32_t)value_uint32(&v));
   value_reset(&v);
 
   widget_destroy(w);
+}
+
+TEST(plot3d, axis_value_at_grid_index) {
+  ASSERT_EQ(0u, plot3d_clamp_grid_index(0, 6));
+  ASSERT_EQ(6u, plot3d_clamp_grid_index(9, 6));
+  ASSERT_EQ(3u, plot3d_clamp_grid_index(3, 6));
+
+  ASSERT_NEAR(-3.0f, plot3d_axis_value_at_grid_index(-3.0f, 3.0f, 6, 0), 0.001f);
+  ASSERT_NEAR(0.0f, plot3d_axis_value_at_grid_index(-3.0f, 3.0f, 6, 3), 0.001f);
+  ASSERT_NEAR(3.0f, plot3d_axis_value_at_grid_index(-3.0f, 3.0f, 6, 6), 0.001f);
+  ASSERT_NEAR(3.0f, plot3d_axis_value_at_grid_index(-3.0f, 3.0f, 6, 99), 0.001f);
 }
 
 TEST(plot3d, grid_count_props) {
@@ -377,44 +384,41 @@ TEST(plot3d, step_grid_position) {
   value_t v;
   widget_t* w = plot3d_create(NULL, 0, 0, 320, 240);
 
-  ASSERT_EQ(RET_OK, plot3d_reset_data(w));
-  ASSERT_EQ(RET_OK, plot3d_append_data_point(w, 0, 0, 0, "#ffffff"));
-  ASSERT_EQ(RET_OK, plot3d_append_data_point(w, 10, 10, 10, "#ffffff"));
   ASSERT_EQ(RET_OK, plot3d_set_z_grid_count(w, 5));
-  ASSERT_EQ(RET_OK, plot3d_set_xy_grid_position(w, 0.0f));
+  ASSERT_EQ(RET_OK, plot3d_set_xy_grid_position(w, 0));
 
   ASSERT_EQ(RET_OK, plot3d_step_xy_grid_position(w, 1));
   ASSERT_EQ(RET_OK, widget_get_prop(w, PLOT3D_PROP_XY_GRID_POSITION, &v));
-  ASSERT_NEAR(2.0f, value_float32(&v), 0.001f);
+  ASSERT_EQ(1u, (uint32_t)value_uint32(&v));
   value_reset(&v);
 
-  ASSERT_EQ(RET_OK, plot3d_set_xy_grid_position(w, 3.0f)); /* off-grid */
+  ASSERT_EQ(RET_OK, plot3d_set_xy_grid_position(w, 5));
   ASSERT_EQ(RET_OK, plot3d_step_xy_grid_position(w, 1));
   ASSERT_EQ(RET_OK, widget_get_prop(w, PLOT3D_PROP_XY_GRID_POSITION, &v));
-  ASSERT_NEAR(4.0f, value_float32(&v), 0.001f);
+  ASSERT_EQ(5u, (uint32_t)value_uint32(&v));
   value_reset(&v);
 
-  ASSERT_EQ(RET_OK, plot3d_set_xy_grid_position(w, 3.0f));
+  ASSERT_EQ(RET_OK, plot3d_set_xy_grid_position(w, 0));
   ASSERT_EQ(RET_OK, plot3d_step_xy_grid_position(w, -1));
   ASSERT_EQ(RET_OK, widget_get_prop(w, PLOT3D_PROP_XY_GRID_POSITION, &v));
-  ASSERT_NEAR(2.0f, value_float32(&v), 0.001f);
-  value_reset(&v);
-
-  ASSERT_EQ(RET_OK, plot3d_set_xy_grid_position(w, 10.0f));
-  ASSERT_EQ(RET_OK, plot3d_step_xy_grid_position(w, 1));
-  ASSERT_EQ(RET_OK, widget_get_prop(w, PLOT3D_PROP_XY_GRID_POSITION, &v));
-  ASSERT_NEAR(10.0f, value_float32(&v), 0.001f);
+  ASSERT_EQ(0u, (uint32_t)value_uint32(&v));
   value_reset(&v);
 
   ASSERT_EQ(RET_BAD_PARAMS, plot3d_step_xy_grid_position(w, 0));
 
-  /* smoke xz/yz once */
   ASSERT_EQ(RET_OK, plot3d_set_y_grid_count(w, 5));
-  ASSERT_EQ(RET_OK, plot3d_set_xz_grid_position(w, 0.0f));
+  ASSERT_EQ(RET_OK, plot3d_set_xz_grid_position(w, 0));
   ASSERT_EQ(RET_OK, plot3d_step_xz_grid_position(w, 1));
+  ASSERT_EQ(RET_OK, widget_get_prop(w, PLOT3D_PROP_XZ_GRID_POSITION, &v));
+  ASSERT_EQ(1u, (uint32_t)value_uint32(&v));
+  value_reset(&v);
+
   ASSERT_EQ(RET_OK, plot3d_set_x_grid_count(w, 5));
-  ASSERT_EQ(RET_OK, plot3d_set_yz_grid_position(w, 0.0f));
+  ASSERT_EQ(RET_OK, plot3d_set_yz_grid_position(w, 0));
   ASSERT_EQ(RET_OK, plot3d_step_yz_grid_position(w, 1));
+  ASSERT_EQ(RET_OK, widget_get_prop(w, PLOT3D_PROP_YZ_GRID_POSITION, &v));
+  ASSERT_EQ(1u, (uint32_t)value_uint32(&v));
+  value_reset(&v);
 
   widget_destroy(w);
 }
@@ -684,53 +688,115 @@ TEST(plot3d, calc_axis_tick_stride) {
             plot3d_calc_axis_tick_stride(100.0f, 5, 1.0f, 0.0f, 30.0f, 18.0f, NULL));
 }
 
-TEST(plot3d, calc_nice_axis) {
-  float_t nice_min = 0;
-  float_t nice_max = 0;
+TEST(plot3d, calc_equal_axis) {
+  float_t out_min = 0;
+  float_t out_max = 0;
   uint32_t count = 0;
   uint32_t decimals = 0;
 
-  /* 步长取 2，范围本身已经整齐 */
-  ASSERT_EQ(RET_OK, plot3d_calc_nice_axis(0.0f, 10.0f, 5, &nice_min, &nice_max, &count, &decimals));
-  ASSERT_NEAR(0.0f, nice_min, 0.001f);
-  ASSERT_NEAR(10.0f, nice_max, 0.001f);
-  ASSERT_EQ(5u, count);
-  ASSERT_EQ(0u, decimals);
-
-  /* 小范围：步长取 0.5，范围向外扩到步长的整数倍，小数位由步长决定 */
-  ASSERT_EQ(RET_OK, plot3d_calc_nice_axis(0.4f, 1.6f, 5, &nice_min, &nice_max, &count, &decimals));
-  ASSERT_NEAR(0.0f, nice_min, 0.001f);
-  ASSERT_NEAR(2.0f, nice_max, 0.001f);
+  /* 验收：[-3,3] 上 4/5/6 格各自精确等分，范围不外扩 */
+  ASSERT_EQ(RET_OK,
+            plot3d_calc_equal_axis(-3.0f, 3.0f, 4, &out_min, &out_max, &count, &decimals));
+  ASSERT_NEAR(-3.0f, out_min, 0.001f);
+  ASSERT_NEAR(3.0f, out_max, 0.001f);
   ASSERT_EQ(4u, count);
   ASSERT_EQ(1u, decimals);
 
-  /* 扩范围之后格数仍不超过上限 */
-  ASSERT_EQ(RET_OK, plot3d_calc_nice_axis(0.2f, 9.9f, 5, &nice_min, &nice_max, &count, &decimals));
-  ASSERT_NEAR(0.0f, nice_min, 0.001f);
-  ASSERT_NEAR(10.0f, nice_max, 0.001f);
+  ASSERT_EQ(RET_OK,
+            plot3d_calc_equal_axis(-3.0f, 3.0f, 5, &out_min, &out_max, &count, &decimals));
+  ASSERT_NEAR(-3.0f, out_min, 0.001f);
+  ASSERT_NEAR(3.0f, out_max, 0.001f);
+  ASSERT_EQ(5u, count);
+
+  ASSERT_EQ(RET_OK,
+            plot3d_calc_equal_axis(-3.0f, 3.0f, 6, &out_min, &out_max, &count, &decimals));
+  ASSERT_NEAR(-3.0f, out_min, 0.001f);
+  ASSERT_NEAR(3.0f, out_max, 0.001f);
+  ASSERT_EQ(6u, count);
+
+  /* 整齐范围仍保持数据边界，count 等于请求值 */
+  ASSERT_EQ(RET_OK,
+            plot3d_calc_equal_axis(0.0f, 10.0f, 5, &out_min, &out_max, &count, &decimals));
+  ASSERT_NEAR(0.0f, out_min, 0.001f);
+  ASSERT_NEAR(10.0f, out_max, 0.001f);
   ASSERT_EQ(5u, count);
   ASSERT_EQ(0u, decimals);
 
-  /* 跨 0 的范围两端都向外取整 */
+  /* 不再外扩到漂亮边界：原 nice 会把 [0.4,1.6] 扩成 [0,2] */
   ASSERT_EQ(RET_OK,
-            plot3d_calc_nice_axis(-1.0f, 1.2f, 5, &nice_min, &nice_max, &count, &decimals));
-  ASSERT_NEAR(-1.0f, nice_min, 0.001f);
-  ASSERT_NEAR(1.5f, nice_max, 0.001f);
+            plot3d_calc_equal_axis(0.4f, 1.6f, 5, &out_min, &out_max, &count, &decimals));
+  ASSERT_NEAR(0.4f, out_min, 0.001f);
+  ASSERT_NEAR(1.6f, out_max, 0.001f);
   ASSERT_EQ(5u, count);
-  ASSERT_EQ(1u, decimals);
 
-  /* 退化范围也要给出可用的刻度 */
-  ASSERT_EQ(RET_OK, plot3d_calc_nice_axis(5.0f, 5.0f, 5, &nice_min, &nice_max, &count, &decimals));
-  ASSERT_TRUE(nice_max > nice_min);
-  ASSERT_TRUE(count >= 1u);
-  ASSERT_TRUE(nice_min <= 5.0f && nice_max >= 5.0f);
-
-  /* 上限为 0 按 1 处理 */
-  ASSERT_EQ(RET_OK, plot3d_calc_nice_axis(0.0f, 10.0f, 0, &nice_min, &nice_max, &count, &decimals));
+  /* count=0 按 1 处理 */
+  ASSERT_EQ(RET_OK,
+            plot3d_calc_equal_axis(0.0f, 10.0f, 0, &out_min, &out_max, &count, &decimals));
   ASSERT_EQ(1u, count);
 
+  /* 退化范围：保护后 max>min，count 仍为请求值 */
+  ASSERT_EQ(RET_OK,
+            plot3d_calc_equal_axis(5.0f, 5.0f, 5, &out_min, &out_max, &count, &decimals));
+  ASSERT_TRUE(out_max > out_min);
+  ASSERT_EQ(5u, count);
+  ASSERT_TRUE(out_min <= 5.0f && out_max >= 5.0f);
+
+  /* step 很小且不被 MIN_EXTENT 改写：extent=0.001, count=50 → step=2e-5 → decimals=3 */
+  ASSERT_EQ(RET_OK,
+            plot3d_calc_equal_axis(0.0f, 0.001f, 50, &out_min, &out_max, &count, &decimals));
+  ASSERT_NEAR(0.0f, out_min, 1e-6f);
+  ASSERT_NEAR(0.001f, out_max, 1e-6f);
+  ASSERT_EQ(50u, count);
+  ASSERT_EQ(3u, decimals);
+
   ASSERT_EQ(RET_BAD_PARAMS,
-            plot3d_calc_nice_axis(0.0f, 1.0f, 5, NULL, &nice_max, &count, &decimals));
+            plot3d_calc_equal_axis(0.0f, 1.0f, 5, NULL, &out_max, &count, &decimals));
+}
+
+TEST(plot3d, calc_bounds_cylinder_include_zero_z) {
+  plot3d_bounds_t bounds;
+  widget_t* w = plot3d_create(NULL, 0, 0, 320, 240);
+  plot3d_t* plot3d = PLOT3D(w);
+
+  /* cylinder：正值 Z 强制扩到 0，X/Y 仍跟数据 */
+  ASSERT_EQ(RET_OK, plot3d_set_plottype(w, "cylinder"));
+  ASSERT_EQ(RET_OK, plot3d_reset_data(w));
+  ASSERT_EQ(RET_OK, plot3d_append_data_point(w, 1.0f, 3.0f, 0.5f, "#ffffff"));
+  ASSERT_EQ(RET_OK, plot3d_append_data_point(w, 2.0f, 4.0f, 1.5f, "#ffffff"));
+  ASSERT_EQ(RET_OK, plot3d_calc_bounds(plot3d, &bounds));
+  ASSERT_NEAR(0.0f, bounds.min_z, 0.001f);
+  ASSERT_NEAR(1.5f, bounds.max_z, 0.001f);
+  ASSERT_NEAR(1.0f, bounds.min_x, 0.001f);
+  ASSERT_NEAR(2.0f, bounds.max_x, 0.001f);
+  ASSERT_NEAR(3.0f, bounds.min_y, 0.001f);
+  ASSERT_NEAR(4.0f, bounds.max_y, 0.001f);
+
+  /* cylinder：负值 Z 强制扩到 0 */
+  ASSERT_EQ(RET_OK, plot3d_reset_data(w));
+  ASSERT_EQ(RET_OK, plot3d_append_data_point(w, 1.0f, 3.0f, -2.0f, "#ffffff"));
+  ASSERT_EQ(RET_OK, plot3d_append_data_point(w, 2.0f, 4.0f, -0.5f, "#ffffff"));
+  ASSERT_EQ(RET_OK, plot3d_calc_bounds(plot3d, &bounds));
+  ASSERT_NEAR(-2.0f, bounds.min_z, 0.001f);
+  ASSERT_NEAR(0.0f, bounds.max_z, 0.001f);
+
+  /* cylinder：已跨 0 则不变 */
+  ASSERT_EQ(RET_OK, plot3d_reset_data(w));
+  ASSERT_EQ(RET_OK, plot3d_append_data_point(w, 1.0f, 3.0f, -1.0f, "#ffffff"));
+  ASSERT_EQ(RET_OK, plot3d_append_data_point(w, 2.0f, 4.0f, 2.0f, "#ffffff"));
+  ASSERT_EQ(RET_OK, plot3d_calc_bounds(plot3d, &bounds));
+  ASSERT_NEAR(-1.0f, bounds.min_z, 0.001f);
+  ASSERT_NEAR(2.0f, bounds.max_z, 0.001f);
+
+  /* surface：正值 Z 不强制扩到 0 */
+  ASSERT_EQ(RET_OK, plot3d_set_plottype(w, "surface"));
+  ASSERT_EQ(RET_OK, plot3d_reset_data(w));
+  ASSERT_EQ(RET_OK, plot3d_append_data_point(w, 1.0f, 3.0f, 0.5f, "#ffffff"));
+  ASSERT_EQ(RET_OK, plot3d_append_data_point(w, 2.0f, 4.0f, 1.5f, "#ffffff"));
+  ASSERT_EQ(RET_OK, plot3d_calc_bounds(plot3d, &bounds));
+  ASSERT_NEAR(0.5f, bounds.min_z, 0.001f);
+  ASSERT_NEAR(1.5f, bounds.max_z, 0.001f);
+
+  widget_destroy(w);
 }
 
 TEST(plot3d, box_aspect_props) {

@@ -219,25 +219,25 @@ typedef struct _plot3d_t {
   float_t camera_z_offset;
 
   /**
-   * @property {float_t} xy_grid_position
+   * @property {uint32_t} xy_grid_position
    * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
-   * XY 网格平面在 Z 轴上的位置。
+   * XY 网格平面在 Z 轴上的网格序号（存储 0～50；绘制/步进按 z_grid_count 夹紧，对齐到该序号网格线）。
    */
-  float_t xy_grid_position;
+  uint32_t xy_grid_position;
 
   /**
-   * @property {float_t} xz_grid_position
+   * @property {uint32_t} xz_grid_position
    * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
-   * XZ 网格平面在 Y 轴上的位置。
+   * XZ 网格平面在 Y 轴上的网格序号（存储 0～50；绘制/步进按 y_grid_count 夹紧，对齐到该序号网格线）。
    */
-  float_t xz_grid_position;
+  uint32_t xz_grid_position;
 
   /**
-   * @property {float_t} yz_grid_position
+   * @property {uint32_t} yz_grid_position
    * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
-   * YZ 网格平面在 X 轴上的位置。
+   * YZ 网格平面在 X 轴上的网格序号（存储 0～50；绘制/步进按 x_grid_count 夹紧，对齐到该序号网格线）。
    */
-  float_t yz_grid_position;
+  uint32_t yz_grid_position;
 
   /**
    * @property {float_t} box_aspect_x
@@ -263,21 +263,21 @@ typedef struct _plot3d_t {
   /**
    * @property {uint32_t} x_grid_count
    * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
-   * X 轴网格格数上限。
+   * X 轴等分格数（设为 N 即画 N 格）。
    */
   uint32_t x_grid_count;
 
   /**
    * @property {uint32_t} y_grid_count
    * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
-   * Y 轴网格格数上限。
+   * Y 轴等分格数（设为 N 即画 N 格）。
    */
   uint32_t y_grid_count;
 
   /**
    * @property {uint32_t} z_grid_count
    * @annotation ["set_prop","get_prop","readable","persitent","design","scriptable"]
-   * Z 轴网格格数上限。
+   * Z 轴等分格数（设为 N 即画 N 格）。
    */
   uint32_t z_grid_count;
 
@@ -1031,43 +1031,43 @@ ret_t plot3d_set_camera_z_offset(widget_t* widget, float_t camera_z_offset);
 
 /**
  * @method plot3d_set_xy_grid_position
- * 设置 XY 网格平面在 Z 轴上的位置。
+ * 设置 XY 网格平面在 Z 轴上的网格序号。
  * @annotation ["scriptable"]
  * @param {widget_t*} widget widget对象。
- * @param {float_t} xy_grid_position 位置。
+ * @param {uint32_t} xy_grid_position 网格序号。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
-ret_t plot3d_set_xy_grid_position(widget_t* widget, float_t xy_grid_position);
+ret_t plot3d_set_xy_grid_position(widget_t* widget, uint32_t xy_grid_position);
 
 /**
  * @method plot3d_set_xz_grid_position
- * 设置 XZ 网格平面在 Y 轴上的位置。
+ * 设置 XZ 网格平面在 Y 轴上的网格序号。
  * @annotation ["scriptable"]
  * @param {widget_t*} widget widget对象。
- * @param {float_t} xz_grid_position 位置。
+ * @param {uint32_t} xz_grid_position 网格序号。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
-ret_t plot3d_set_xz_grid_position(widget_t* widget, float_t xz_grid_position);
+ret_t plot3d_set_xz_grid_position(widget_t* widget, uint32_t xz_grid_position);
 
 /**
  * @method plot3d_set_yz_grid_position
- * 设置 YZ 网格平面在 X 轴上的位置。
+ * 设置 YZ 网格平面在 X 轴上的网格序号。
  * @annotation ["scriptable"]
  * @param {widget_t*} widget widget对象。
- * @param {float_t} yz_grid_position 位置。
+ * @param {uint32_t} yz_grid_position 网格序号。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
-ret_t plot3d_set_yz_grid_position(widget_t* widget, float_t yz_grid_position);
+ret_t plot3d_set_yz_grid_position(widget_t* widget, uint32_t yz_grid_position);
 
 /**
  * @method plot3d_step_xy_grid_position
- * 按刻度步进调整 XY 网格平面位置。
+ * 按网格序号步进调整 XY 平面（沿 Z，夹紧到 z_grid_count）。
  * @annotation ["scriptable"]
  * @param {widget_t*} widget widget对象。
- * @param {int32_t} dir 方向：正数向前，负数向后。
+ * @param {int32_t} dir 方向：正数增大序号，负数减小序号，0 非法。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
@@ -1075,10 +1075,10 @@ ret_t plot3d_step_xy_grid_position(widget_t* widget, int32_t dir);
 
 /**
  * @method plot3d_step_xz_grid_position
- * 按刻度步进调整 XZ 网格平面位置。
+ * 按网格序号步进调整 XZ 平面（沿 Y，夹紧到 y_grid_count）。
  * @annotation ["scriptable"]
  * @param {widget_t*} widget widget对象。
- * @param {int32_t} dir 方向：正数向前，负数向后。
+ * @param {int32_t} dir 方向：正数增大序号，负数减小序号，0 非法。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
@@ -1086,10 +1086,10 @@ ret_t plot3d_step_xz_grid_position(widget_t* widget, int32_t dir);
 
 /**
  * @method plot3d_step_yz_grid_position
- * 按刻度步进调整 YZ 网格平面位置。
+ * 按网格序号步进调整 YZ 平面（沿 X，夹紧到 x_grid_count）。
  * @annotation ["scriptable"]
  * @param {widget_t*} widget widget对象。
- * @param {int32_t} dir 方向：正数向前，负数向后。
+ * @param {int32_t} dir 方向：正数增大序号，负数减小序号，0 非法。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
@@ -1130,10 +1130,10 @@ ret_t plot3d_set_box_aspect_z(widget_t* widget, float_t box_aspect_z);
 
 /**
  * @method plot3d_set_x_grid_count
- * 设置 X 轴网格格数上限。
+ * 设置 X 轴等分格数（设为 N 即画 N 格）。
  * @annotation ["scriptable"]
  * @param {widget_t*} widget widget对象。
- * @param {uint32_t} x_grid_count 格数上限。
+ * @param {uint32_t} x_grid_count 等分格数（设为 N 即画 N 格）。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
@@ -1141,10 +1141,10 @@ ret_t plot3d_set_x_grid_count(widget_t* widget, uint32_t x_grid_count);
 
 /**
  * @method plot3d_set_y_grid_count
- * 设置 Y 轴网格格数上限。
+ * 设置 Y 轴等分格数（设为 N 即画 N 格）。
  * @annotation ["scriptable"]
  * @param {widget_t*} widget widget对象。
- * @param {uint32_t} y_grid_count 格数上限。
+ * @param {uint32_t} y_grid_count 等分格数（设为 N 即画 N 格）。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
@@ -1152,16 +1152,20 @@ ret_t plot3d_set_y_grid_count(widget_t* widget, uint32_t y_grid_count);
 
 /**
  * @method plot3d_set_z_grid_count
- * 设置 Z 轴网格格数上限。
+ * 设置 Z 轴等分格数（设为 N 即画 N 格）。
  * @annotation ["scriptable"]
  * @param {widget_t*} widget widget对象。
- * @param {uint32_t} z_grid_count 格数上限。
+ * @param {uint32_t} z_grid_count 等分格数（设为 N 即画 N 格）。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
 ret_t plot3d_set_z_grid_count(widget_t* widget, uint32_t z_grid_count);
 
 /*for test*/
+uint32_t plot3d_clamp_grid_index(uint32_t index, uint32_t grid_count);
+float_t plot3d_axis_value_at_grid_index(float_t min_v, float_t max_v, uint32_t grid_count,
+                                        uint32_t index);
+
 typedef struct _plot3d_axis_color_segment_t {
   float_t t0;
   float_t t1;
@@ -1224,20 +1228,20 @@ ret_t plot3d_calc_axis_scales(bool_t equal_axis, float_t extent_x, float_t exten
                                float_t* out_scale_z);
 
 /**
- * @method plot3d_calc_nice_axis
- * 计算美观的坐标轴刻度范围。
+ * @method plot3d_calc_equal_axis
+ * 按等分计算坐标轴范围与格数（保持数据 min/max，不外扩到漂亮刻度）。
  * @annotation ["global"]
  * @param {float_t} min_v 最小值。
  * @param {float_t} max_v 最大值。
- * @param {uint32_t} max_count 最大刻度数。
+ * @param {uint32_t} count 等分格数（设为 N 即画 N 格；0 按 1 处理）。
  * @param {float_t*} out_min 返回最小值。
  * @param {float_t*} out_max 返回最大值。
- * @param {uint32_t*} out_count 返回刻度数。
+ * @param {uint32_t*} out_count 返回格数（等于夹紧后的 count）。
  * @param {uint32_t*} out_decimals 返回小数位数。
  *
  * @return {ret_t} 返回RET_OK表示成功，否则表示失败。
  */
-ret_t plot3d_calc_nice_axis(float_t min_v, float_t max_v, uint32_t max_count, float_t* out_min,
+ret_t plot3d_calc_equal_axis(float_t min_v, float_t max_v, uint32_t count, float_t* out_min,
                              float_t* out_max, uint32_t* out_count, uint32_t* out_decimals);
 
 /**

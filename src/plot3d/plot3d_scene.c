@@ -33,9 +33,8 @@
 #define PLOT3D_DEPTH_BIAS 0.8f
 /* 边长为 1 的立方体的对角线长度，用作盒子变形后自动缩放的基准。 */
 #define PLOT3D_CUBE_DIAGONAL 1.7320508f
-#define PLOT3D_NICE_STEP_EPS 1e-4f
-#define PLOT3D_NICE_STEP_MAX_TRY 8
-#define PLOT3D_NICE_MAX_DECIMALS 6
+#define PLOT3D_AXIS_STEP_EPS 1e-4f
+#define PLOT3D_EQUAL_MAX_DECIMALS 3
 #define PLOT3D_AXIS_TEXT_DEFAULT_FONT_SIZE 14.0f
 #define PLOT3D_AXIS_TEXT_MIN_GAP 4.0f
 #define PLOT3D_AXIS_EDGE_EPS 1e-6f
@@ -115,43 +114,33 @@ ret_t plot3d_calc_axis_scales(bool_t equal_axis, float_t extent_x, float_t exten
   return RET_OK;
 }
 
-static float_t plot3d_next_nice_step(float_t step) {
-  float_t mag = powf(10.0f, floorf(log10f(step) + PLOT3D_NICE_STEP_EPS));
-  float_t norm = step / mag;
+static uint32_t plot3d_calc_axis_decimals(float_t step) {
+  uint32_t d = 0;
+  return_value_if_fail(step > 0.0f, 0u);
 
-  if (norm < 1.5f) {
-    return mag * 2.0f;
-  } else if (norm < 3.5f) {
-    return mag * 5.0f;
+  for (d = 0; d <= PLOT3D_EQUAL_MAX_DECIMALS; d++) {
+    float_t scale = powf(10.0f, (float_t)d);
+    float_t scaled = step * scale;
+    float_t nearest = floorf(scaled + 0.5f);
+    if (fabsf(scaled - nearest) <= PLOT3D_AXIS_STEP_EPS * scale) {
+      if (fabsf(nearest) <= PLOT3D_AXIS_STEP_EPS) {
+        continue; /* tiny step rounded to 0 — need more digits */
+      }
+      return d;
+    }
   }
 
-  return mag * 10.0f;
+  return PLOT3D_EQUAL_MAX_DECIMALS;
 }
 
-static uint32_t plot3d_calc_nice_decimals(float_t step) {
-  float_t decimals = 0;
-
-  if (step >= 1.0f) {
-    return 0;
-  }
-
-  decimals = ceilf(-log10f(step) - PLOT3D_NICE_STEP_EPS);
-
-  return (uint32_t)tk_min(tk_max(decimals, 0.0f), (float_t)PLOT3D_NICE_MAX_DECIMALS);
-}
-
-ret_t plot3d_calc_nice_axis(float_t min_v, float_t max_v, uint32_t max_count, float_t* out_min,
+ret_t plot3d_calc_equal_axis(float_t min_v, float_t max_v, uint32_t count, float_t* out_min,
                              float_t* out_max, uint32_t* out_count, uint32_t* out_decimals) {
   float_t step = 0;
-  float_t nice_min = 0;
-  float_t nice_max = 0;
-  uint32_t count = 0;
-  uint32_t i = 0;
   return_value_if_fail(out_min != NULL && out_max != NULL && out_count != NULL &&
                            out_decimals != NULL,
                        RET_BAD_PARAMS);
 
-  max_count = tk_max(1u, max_count);
+  count = tk_max(1u, count);
   if (max_v < min_v) {
     float_t t = min_v;
     min_v = max_v;
@@ -163,28 +152,11 @@ ret_t plot3d_calc_nice_axis(float_t min_v, float_t max_v, uint32_t max_count, fl
     max_v += 0.5f;
   }
 
-  step = (max_v - min_v) / (float_t)max_count;
-  step = powf(10.0f, floorf(log10f(step)));
-
-  for (i = 0; i < PLOT3D_NICE_STEP_MAX_TRY; i++) {
-    nice_min = floorf(min_v / step) * step;
-    nice_max = ceilf(max_v / step) * step;
-    count = (uint32_t)((nice_max - nice_min) / step + 0.5f);
-    if (count >= 1 && count <= max_count) {
-      break;
-    }
-    step = plot3d_next_nice_step(step);
-  }
-
-  if (count < 1) {
-    nice_max = nice_min + step;
-    count = 1;
-  }
-
-  *out_min = nice_min;
-  *out_max = nice_max;
+  step = (max_v - min_v) / (float_t)count;
+  *out_min = min_v;
+  *out_max = max_v;
   *out_count = count;
-  *out_decimals = plot3d_calc_nice_decimals(step);
+  *out_decimals = plot3d_calc_axis_decimals(step);
 
   return RET_OK;
 }
@@ -398,11 +370,17 @@ ret_t plot3d_calc_bounds(plot3d_t* plot3d, plot3d_bounds_t* bounds) {
     bounds->valid = TRUE;
   }
 
-  plot3d_calc_nice_axis(bounds->min_x, bounds->max_x, plot3d->x_grid_count, &(bounds->min_x),
+  /* cylinder 柱底固定 z=0，bounds 必须包含 0，否则柱底悬在网格外。 */
+  if (plot3d->plottype != NULL && tk_str_eq(plot3d->plottype, "cylinder")) {
+    bounds->min_z = tk_min(bounds->min_z, 0.0f);
+    bounds->max_z = tk_max(bounds->max_z, 0.0f);
+  }
+
+  plot3d_calc_equal_axis(bounds->min_x, bounds->max_x, plot3d->x_grid_count, &(bounds->min_x),
                          &(bounds->max_x), &(bounds->count_x), &(bounds->decimals_x));
-  plot3d_calc_nice_axis(bounds->min_y, bounds->max_y, plot3d->y_grid_count, &(bounds->min_y),
+  plot3d_calc_equal_axis(bounds->min_y, bounds->max_y, plot3d->y_grid_count, &(bounds->min_y),
                          &(bounds->max_y), &(bounds->count_y), &(bounds->decimals_y));
-  plot3d_calc_nice_axis(bounds->min_z, bounds->max_z, plot3d->z_grid_count, &(bounds->min_z),
+  plot3d_calc_equal_axis(bounds->min_z, bounds->max_z, plot3d->z_grid_count, &(bounds->min_z),
                          &(bounds->max_z), &(bounds->count_z), &(bounds->decimals_z));
 
   bounds->center_x = (bounds->min_x + bounds->max_x) * 0.5f;

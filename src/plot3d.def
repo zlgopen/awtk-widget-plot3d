@@ -87,7 +87,7 @@ EXPORTS
     plot3d_set_z_grid_count
     plot3d_pick_axis_text_normal
     plot3d_calc_axis_scales
-    plot3d_calc_nice_axis
+    plot3d_calc_equal_axis
     plot3d_build_axis_color_segments
     plot3d_pick_axis_text_edge
     plot3d_calc_axis_tick_offset

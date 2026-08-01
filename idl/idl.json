@@ -1834,15 +1834,15 @@
             "desc": "widget对象。"
           },
           {
-            "type": "float_t",
+            "type": "uint32_t",
             "name": "xy_grid_position",
-            "desc": "位置。"
+            "desc": "网格序号。"
           }
         ],
         "annotation": {
           "scriptable": true
         },
-        "desc": "设置 XY 网格平面在 Z 轴上的位置。",
+        "desc": "设置 XY 网格平面在 Z 轴上的网格序号。",
         "name": "plot3d_set_xy_grid_position",
         "return": {
           "type": "ret_t",
@@ -1857,15 +1857,15 @@
             "desc": "widget对象。"
           },
           {
-            "type": "float_t",
+            "type": "uint32_t",
             "name": "xz_grid_position",
-            "desc": "位置。"
+            "desc": "网格序号。"
           }
         ],
         "annotation": {
           "scriptable": true
         },
-        "desc": "设置 XZ 网格平面在 Y 轴上的位置。",
+        "desc": "设置 XZ 网格平面在 Y 轴上的网格序号。",
         "name": "plot3d_set_xz_grid_position",
         "return": {
           "type": "ret_t",
@@ -1880,15 +1880,15 @@
             "desc": "widget对象。"
           },
           {
-            "type": "float_t",
+            "type": "uint32_t",
             "name": "yz_grid_position",
-            "desc": "位置。"
+            "desc": "网格序号。"
           }
         ],
         "annotation": {
           "scriptable": true
         },
-        "desc": "设置 YZ 网格平面在 X 轴上的位置。",
+        "desc": "设置 YZ 网格平面在 X 轴上的网格序号。",
         "name": "plot3d_set_yz_grid_position",
         "return": {
           "type": "ret_t",
@@ -1905,13 +1905,13 @@
           {
             "type": "int32_t",
             "name": "dir",
-            "desc": "方向：正数向前，负数向后。"
+            "desc": "方向：正数增大序号，负数减小序号，0 非法。"
           }
         ],
         "annotation": {
           "scriptable": true
         },
-        "desc": "按刻度步进调整 XY 网格平面位置。",
+        "desc": "按网格序号步进调整 XY 平面（沿 Z，夹紧到 z_grid_count）。",
         "name": "plot3d_step_xy_grid_position",
         "return": {
           "type": "ret_t",
@@ -1928,13 +1928,13 @@
           {
             "type": "int32_t",
             "name": "dir",
-            "desc": "方向：正数向前，负数向后。"
+            "desc": "方向：正数增大序号，负数减小序号，0 非法。"
           }
         ],
         "annotation": {
           "scriptable": true
         },
-        "desc": "按刻度步进调整 XZ 网格平面位置。",
+        "desc": "按网格序号步进调整 XZ 平面（沿 Y，夹紧到 y_grid_count）。",
         "name": "plot3d_step_xz_grid_position",
         "return": {
           "type": "ret_t",
@@ -1951,13 +1951,13 @@
           {
             "type": "int32_t",
             "name": "dir",
-            "desc": "方向：正数向前，负数向后。"
+            "desc": "方向：正数增大序号，负数减小序号，0 非法。"
           }
         ],
         "annotation": {
           "scriptable": true
         },
-        "desc": "按刻度步进调整 YZ 网格平面位置。",
+        "desc": "按网格序号步进调整 YZ 平面（沿 X，夹紧到 x_grid_count）。",
         "name": "plot3d_step_yz_grid_position",
         "return": {
           "type": "ret_t",
@@ -2043,13 +2043,13 @@
           {
             "type": "uint32_t",
             "name": "x_grid_count",
-            "desc": "格数上限。"
+            "desc": "等分格数（设为 N 即画 N 格）。"
           }
         ],
         "annotation": {
           "scriptable": true
         },
-        "desc": "设置 X 轴网格格数上限。",
+        "desc": "设置 X 轴等分格数（设为 N 即画 N 格）。",
         "name": "plot3d_set_x_grid_count",
         "return": {
           "type": "ret_t",
@@ -2066,13 +2066,13 @@
           {
             "type": "uint32_t",
             "name": "y_grid_count",
-            "desc": "格数上限。"
+            "desc": "等分格数（设为 N 即画 N 格）。"
           }
         ],
         "annotation": {
           "scriptable": true
         },
-        "desc": "设置 Y 轴网格格数上限。",
+        "desc": "设置 Y 轴等分格数（设为 N 即画 N 格）。",
         "name": "plot3d_set_y_grid_count",
         "return": {
           "type": "ret_t",
@@ -2089,13 +2089,13 @@
           {
             "type": "uint32_t",
             "name": "z_grid_count",
-            "desc": "格数上限。"
+            "desc": "等分格数（设为 N 即画 N 格）。"
           }
         ],
         "annotation": {
           "scriptable": true
         },
-        "desc": "设置 Z 轴网格格数上限。",
+        "desc": "设置 Z 轴等分格数（设为 N 即画 N 格）。",
         "name": "plot3d_set_z_grid_count",
         "return": {
           "type": "ret_t",
@@ -2287,8 +2287,8 @@
       },
       {
         "type": "uint32_t",
-        "name": "max_count",
-        "desc": "最大刻度数。"
+        "name": "count",
+        "desc": "等分格数（设为 N 即画 N 格；0 按 1 处理）。"
       },
       {
         "type": "float_t*",
@@ -2303,7 +2303,7 @@
       {
         "type": "uint32_t*",
         "name": "out_count",
-        "desc": "返回刻度数。"
+        "desc": "返回格数（等于夹紧后的 count）。"
       },
       {
         "type": "uint32_t*",
@@ -2314,8 +2314,8 @@
     "annotation": {
       "global": true
     },
-    "desc": "计算美观的坐标轴刻度范围。",
-    "name": "plot3d_calc_nice_axis",
+    "desc": "按等分计算坐标轴范围与格数（保持数据 min/max，不外扩到漂亮刻度）。",
+    "name": "plot3d_calc_equal_axis",
     "return": {
       "type": "ret_t",
       "desc": "返回RET_OK表示成功，否则表示失败。"
@@ -4087,8 +4087,8 @@
       },
       {
         "name": "xy_grid_position",
-        "desc": "XY 网格平面在 Z 轴上的位置。",
-        "type": "float_t",
+        "desc": "XY 网格平面在 Z 轴上的网格序号（存储 0～50；绘制/步进按 z_grid_count 夹紧，对齐到该序号网格线）。",
+        "type": "uint32_t",
         "annotation": {
           "set_prop": true,
           "get_prop": true,
@@ -4100,8 +4100,8 @@
       },
       {
         "name": "xz_grid_position",
-        "desc": "XZ 网格平面在 Y 轴上的位置。",
-        "type": "float_t",
+        "desc": "XZ 网格平面在 Y 轴上的网格序号（存储 0～50；绘制/步进按 y_grid_count 夹紧，对齐到该序号网格线）。",
+        "type": "uint32_t",
         "annotation": {
           "set_prop": true,
           "get_prop": true,
@@ -4113,8 +4113,8 @@
       },
       {
         "name": "yz_grid_position",
-        "desc": "YZ 网格平面在 X 轴上的位置。",
-        "type": "float_t",
+        "desc": "YZ 网格平面在 X 轴上的网格序号（存储 0～50；绘制/步进按 x_grid_count 夹紧，对齐到该序号网格线）。",
+        "type": "uint32_t",
         "annotation": {
           "set_prop": true,
           "get_prop": true,
@@ -4165,7 +4165,7 @@
       },
       {
         "name": "x_grid_count",
-        "desc": "X 轴网格格数上限。",
+        "desc": "X 轴等分格数（设为 N 即画 N 格）。",
         "type": "uint32_t",
         "annotation": {
           "set_prop": true,
@@ -4178,7 +4178,7 @@
       },
       {
         "name": "y_grid_count",
-        "desc": "Y 轴网格格数上限。",
+        "desc": "Y 轴等分格数（设为 N 即画 N 格）。",
         "type": "uint32_t",
         "annotation": {
           "set_prop": true,
@@ -4191,7 +4191,7 @@
       },
       {
         "name": "z_grid_count",
-        "desc": "Z 轴网格格数上限。",
+        "desc": "Z 轴等分格数（设为 N 即画 N 格）。",
         "type": "uint32_t",
         "annotation": {
           "set_prop": true,

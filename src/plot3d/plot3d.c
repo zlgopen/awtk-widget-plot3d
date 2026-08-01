@@ -1075,28 +1075,41 @@ ret_t plot3d_set_camera_z_offset(widget_t* widget, float_t camera_z_offset) {
   return plot3d_mark_cache_dirty(widget);
 }
 
-static ret_t plot3d_set_grid_position_field(widget_t* widget, float_t* field, float_t position) {
-  *field = position;
+uint32_t plot3d_clamp_grid_index(uint32_t index, uint32_t grid_count) {
+  grid_count = tk_max(1u, grid_count);
+  return tk_min(index, grid_count);
+}
+
+float_t plot3d_axis_value_at_grid_index(float_t min_v, float_t max_v, uint32_t grid_count,
+                                        uint32_t index) {
+  uint32_t i = 0;
+  grid_count = tk_max(1u, grid_count);
+  i = plot3d_clamp_grid_index(index, grid_count);
+  return min_v + (max_v - min_v) * (float_t)i / (float_t)grid_count;
+}
+
+static ret_t plot3d_set_grid_position_field(widget_t* widget, uint32_t* field, uint32_t position) {
+  *field = tk_min(position, PLOT3D_MAX_GRID_COUNT);
   widget_invalidate(widget, NULL);
 
   return RET_OK;
 }
 
-ret_t plot3d_set_xy_grid_position(widget_t* widget, float_t xy_grid_position) {
+ret_t plot3d_set_xy_grid_position(widget_t* widget, uint32_t xy_grid_position) {
   plot3d_t* plot3d = PLOT3D(widget);
   return_value_if_fail(plot3d != NULL, RET_BAD_PARAMS);
 
   return plot3d_set_grid_position_field(widget, &(plot3d->xy_grid_position), xy_grid_position);
 }
 
-ret_t plot3d_set_xz_grid_position(widget_t* widget, float_t xz_grid_position) {
+ret_t plot3d_set_xz_grid_position(widget_t* widget, uint32_t xz_grid_position) {
   plot3d_t* plot3d = PLOT3D(widget);
   return_value_if_fail(plot3d != NULL, RET_BAD_PARAMS);
 
   return plot3d_set_grid_position_field(widget, &(plot3d->xz_grid_position), xz_grid_position);
 }
 
-ret_t plot3d_set_yz_grid_position(widget_t* widget, float_t yz_grid_position) {
+ret_t plot3d_set_yz_grid_position(widget_t* widget, uint32_t yz_grid_position) {
   plot3d_t* plot3d = PLOT3D(widget);
   return_value_if_fail(plot3d != NULL, RET_BAD_PARAMS);
 
@@ -1156,82 +1169,49 @@ ret_t plot3d_set_z_grid_count(widget_t* widget, uint32_t z_grid_count) {
   return plot3d_set_grid_count_field(widget, &(plot3d->z_grid_count), z_grid_count);
 }
 
-static float_t plot3d_pick_step_position(float_t pos, float_t min_v, float_t extent,
-                                          uint32_t count, int32_t dir) {
-  uint32_t i = 0;
-  int32_t on_index = -1;
-  float_t step = extent / (float_t)count;
-  float_t eps = tk_max(extent * 1e-4f, 1e-6f);
-
-  for (i = 0; i <= count; i++) {
-    float_t v = min_v + step * (float_t)i;
-    if (tk_abs(pos - v) <= eps) {
-      on_index = (int32_t)i;
-      break;
-    }
-  }
-
-  if (on_index >= 0) {
-    int32_t next_index = on_index + (dir > 0 ? 1 : -1);
-    next_index = tk_max(0, tk_min((int32_t)count, next_index));
-    return min_v + step * (float_t)next_index;
-  }
-
-  if (dir > 0) {
-    for (i = 0; i <= count; i++) {
-      float_t v = min_v + step * (float_t)i;
-      if (v > pos + eps) {
-        return v;
-      }
-    }
-    return min_v + extent;
-  }
-
-  for (i = count + 1; i > 0; i--) {
-    float_t v = min_v + step * (float_t)(i - 1);
-    if (v < pos - eps) {
-      return v;
-    }
-  }
-
-  return min_v;
-}
-
-/* 网格面用它的法线轴标识：xy 面沿 z 挪，xz 面沿 y 挪，yz 面沿 x 挪。 */
-static ret_t plot3d_step_grid_position(widget_t* widget, plot3d_axis_t axis, float_t* field,
-                                        int32_t dir) {
-  plot3d_t* plot3d = PLOT3D(widget);
-  plot3d_bounds_t bounds;
-  plot3d_axis_range_t range;
-  float_t position = 0;
-  return_value_if_fail(plot3d != NULL && dir != 0, RET_BAD_PARAMS);
-  return_value_if_fail(plot3d_calc_bounds(plot3d, &bounds) == RET_OK, RET_FAIL);
-  return_value_if_fail(plot3d_bounds_get_axis(&bounds, axis, &range) == RET_OK, RET_FAIL);
-
-  position = plot3d_pick_step_position(*field, range.min_v, range.extent, range.count, dir);
-
-  return plot3d_set_grid_position_field(widget, field, position);
-}
-
 ret_t plot3d_step_xy_grid_position(widget_t* widget, int32_t dir) {
   plot3d_t* plot3d = PLOT3D(widget);
-  return_value_if_fail(plot3d != NULL, RET_BAD_PARAMS);
-
-  return plot3d_step_grid_position(widget, PLOT3D_AXIS_Z, &(plot3d->xy_grid_position), dir);
+  uint32_t next = 0;
+  return_value_if_fail(plot3d != NULL && dir != 0, RET_BAD_PARAMS);
+  if (dir > 0) {
+    next = plot3d->xy_grid_position + 1u;
+  } else if (plot3d->xy_grid_position > 0) {
+    next = plot3d->xy_grid_position - 1u;
+  } else {
+    next = 0;
+  }
+  next = plot3d_clamp_grid_index(next, plot3d->z_grid_count);
+  return plot3d_set_xy_grid_position(widget, next);
 }
 
 ret_t plot3d_step_xz_grid_position(widget_t* widget, int32_t dir) {
   plot3d_t* plot3d = PLOT3D(widget);
-  return_value_if_fail(plot3d != NULL, RET_BAD_PARAMS);
-
-  return plot3d_step_grid_position(widget, PLOT3D_AXIS_Y, &(plot3d->xz_grid_position), dir);
+  uint32_t next = 0;
+  return_value_if_fail(plot3d != NULL && dir != 0, RET_BAD_PARAMS);
+  if (dir > 0) {
+    next = plot3d->xz_grid_position + 1u;
+  } else if (plot3d->xz_grid_position > 0) {
+    next = plot3d->xz_grid_position - 1u;
+  } else {
+    next = 0;
+  }
+  next = plot3d_clamp_grid_index(next, plot3d->y_grid_count);
+  return plot3d_set_xz_grid_position(widget, next);
 }
 
 ret_t plot3d_step_yz_grid_position(widget_t* widget, int32_t dir) {
   plot3d_t* plot3d = PLOT3D(widget);
-  return_value_if_fail(plot3d != NULL, RET_BAD_PARAMS);
-
-  return plot3d_step_grid_position(widget, PLOT3D_AXIS_X, &(plot3d->yz_grid_position), dir);
+  uint32_t next = 0;
+  return_value_if_fail(plot3d != NULL && dir != 0, RET_BAD_PARAMS);
+  if (dir > 0) {
+    next = plot3d->yz_grid_position + 1u;
+  } else if (plot3d->yz_grid_position > 0) {
+    next = plot3d->yz_grid_position - 1u;
+  } else {
+    next = 0;
+  }
+  next = plot3d_clamp_grid_index(next, plot3d->x_grid_count);
+  return plot3d_set_yz_grid_position(widget, next);
 }
 
 static color_t plot3d_modulate_color(color_t c, float_t factor) {
@@ -1529,13 +1509,13 @@ static ret_t plot3d_get_prop(widget_t* widget, const char* name, value_t* v) {
     value_set_float(v, plot3d->camera_z_offset);
     return RET_OK;
   } else if (tk_str_eq(PLOT3D_PROP_XY_GRID_POSITION, name)) {
-    value_set_float(v, plot3d->xy_grid_position);
+    value_set_uint32(v, plot3d->xy_grid_position);
     return RET_OK;
   } else if (tk_str_eq(PLOT3D_PROP_XZ_GRID_POSITION, name)) {
-    value_set_float(v, plot3d->xz_grid_position);
+    value_set_uint32(v, plot3d->xz_grid_position);
     return RET_OK;
   } else if (tk_str_eq(PLOT3D_PROP_YZ_GRID_POSITION, name)) {
-    value_set_float(v, plot3d->yz_grid_position);
+    value_set_uint32(v, plot3d->yz_grid_position);
     return RET_OK;
   } else if (tk_str_eq(PLOT3D_PROP_BOX_ASPECT_X, name)) {
     value_set_float(v, plot3d->box_aspect_x);
@@ -1621,11 +1601,23 @@ static ret_t plot3d_set_prop(widget_t* widget, const char* name, const value_t* 
   } else if (tk_str_eq(PLOT3D_PROP_CAMERA_Z_OFFSET, name)) {
     return plot3d_set_camera_z_offset(widget, value_float(v));
   } else if (tk_str_eq(PLOT3D_PROP_XY_GRID_POSITION, name)) {
-    return plot3d_set_xy_grid_position(widget, value_float(v));
+    int32_t n = value_int(v);
+    if (n < 0) {
+      n = 0;
+    }
+    return plot3d_set_xy_grid_position(widget, (uint32_t)n);
   } else if (tk_str_eq(PLOT3D_PROP_XZ_GRID_POSITION, name)) {
-    return plot3d_set_xz_grid_position(widget, value_float(v));
+    int32_t n = value_int(v);
+    if (n < 0) {
+      n = 0;
+    }
+    return plot3d_set_xz_grid_position(widget, (uint32_t)n);
   } else if (tk_str_eq(PLOT3D_PROP_YZ_GRID_POSITION, name)) {
-    return plot3d_set_yz_grid_position(widget, value_float(v));
+    int32_t n = value_int(v);
+    if (n < 0) {
+      n = 0;
+    }
+    return plot3d_set_yz_grid_position(widget, (uint32_t)n);
   } else if (tk_str_eq(PLOT3D_PROP_BOX_ASPECT_X, name)) {
     return plot3d_set_box_aspect_x(widget, value_float(v));
   } else if (tk_str_eq(PLOT3D_PROP_BOX_ASPECT_Y, name)) {
