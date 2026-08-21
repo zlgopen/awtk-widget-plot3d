@@ -2154,6 +2154,68 @@
   {
     "params": [
       {
+        "type": "uint32_t",
+        "name": "index",
+        "desc": "网格序号。"
+      },
+      {
+        "type": "uint32_t",
+        "name": "grid_count",
+        "desc": "等分格数（至少按 1 处理）。"
+      }
+    ],
+    "annotation": {
+      "global": true
+    },
+    "desc": "将网格序号钳制到 [0, grid_count]。",
+    "name": "plot3d_clamp_grid_index",
+    "return": {
+      "type": "uint32_t",
+      "desc": "返回钳制后的网格序号。"
+    },
+    "type": "method",
+    "header": "plot3d/plot3d.h",
+    "level": 1
+  },
+  {
+    "params": [
+      {
+        "type": "float_t",
+        "name": "min_v",
+        "desc": "轴最小值。"
+      },
+      {
+        "type": "float_t",
+        "name": "max_v",
+        "desc": "轴最大值。"
+      },
+      {
+        "type": "uint32_t",
+        "name": "grid_count",
+        "desc": "等分格数（至少按 1 处理）。"
+      },
+      {
+        "type": "uint32_t",
+        "name": "index",
+        "desc": "网格序号（超出范围时钳制到边界）。"
+      }
+    ],
+    "annotation": {
+      "global": true
+    },
+    "desc": "按等分网格序号计算轴上对应的数值。",
+    "name": "plot3d_axis_value_at_grid_index",
+    "return": {
+      "type": "float_t",
+      "desc": "返回对应的轴坐标值。"
+    },
+    "type": "method",
+    "header": "plot3d/plot3d.h",
+    "level": 1
+  },
+  {
+    "params": [
+      {
         "type": "float_t",
         "name": "dx",
         "desc": "轴方向 x。"

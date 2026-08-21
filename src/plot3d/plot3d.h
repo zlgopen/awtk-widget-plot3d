@@ -1161,8 +1161,28 @@ ret_t plot3d_set_y_grid_count(widget_t* widget, uint32_t y_grid_count);
  */
 ret_t plot3d_set_z_grid_count(widget_t* widget, uint32_t z_grid_count);
 
-/*for test*/
+/**
+ * @method plot3d_clamp_grid_index
+ * 将网格序号钳制到 [0, grid_count]。
+ * @annotation ["global"]
+ * @param {uint32_t} index 网格序号。
+ * @param {uint32_t} grid_count 等分格数（至少按 1 处理）。
+ *
+ * @return {uint32_t} 返回钳制后的网格序号。
+ */
 uint32_t plot3d_clamp_grid_index(uint32_t index, uint32_t grid_count);
+
+/**
+ * @method plot3d_axis_value_at_grid_index
+ * 按等分网格序号计算轴上对应的数值。
+ * @annotation ["global"]
+ * @param {float_t} min_v 轴最小值。
+ * @param {float_t} max_v 轴最大值。
+ * @param {uint32_t} grid_count 等分格数（至少按 1 处理）。
+ * @param {uint32_t} index 网格序号（超出范围时钳制到边界）。
+ *
+ * @return {float_t} 返回对应的轴坐标值。
+ */
 float_t plot3d_axis_value_at_grid_index(float_t min_v, float_t max_v, uint32_t grid_count,
                                         uint32_t index);
 

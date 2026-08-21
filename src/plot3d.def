@@ -85,6 +85,8 @@ EXPORTS
     plot3d_set_x_grid_count
     plot3d_set_y_grid_count
     plot3d_set_z_grid_count
+    plot3d_clamp_grid_index
+    plot3d_axis_value_at_grid_index
     plot3d_pick_axis_text_normal
     plot3d_calc_axis_scales
     plot3d_calc_equal_axis
