@@ -25,6 +25,7 @@
 #include <string.h>
 
 #include "base/vgcanvas.h"
+#include "base/widget_vtable.h"
 #include "tkc/color_parser.h"
 #include "tkc/log.h"
 #include "tkc/mem.h"
@@ -1727,7 +1728,7 @@ static ret_t plot3d_on_destroy(widget_t* widget) {
   return RET_OK;
 }
 
-static ret_t plot3d_on_paint_self(widget_t* widget, canvas_t* c) {
+static ret_t plot3d_on_paint_self_impl(widget_t* widget, canvas_t* c) {
   plot3d_t* plot3d = PLOT3D(widget);
   plot3d_bounds_t bounds;
   return_value_if_fail(plot3d != NULL, RET_BAD_PARAMS);
@@ -1747,6 +1748,10 @@ static ret_t plot3d_on_paint_self(widget_t* widget, canvas_t* c) {
   }
 
   return RET_OK;
+}
+
+static ret_t plot3d_on_paint_self(widget_t* widget, canvas_t* c) {
+  return widget_paint_with_clip(widget, NULL, c, plot3d_on_paint_self_impl);
 }
 
 static ret_t plot3d_on_event(widget_t* widget, event_t* e) {
