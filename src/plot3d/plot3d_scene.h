@@ -81,6 +81,22 @@ bool_t plot3d_project_world_point(widget_t* widget, const plot3d_bounds_t* bound
                                    float_t y, float_t z, plot3d_projected_point_t* out);
 
 /**
+ * @method plot3d_grid_plane_faces_camera
+ * 判断三个网格面是否挡在数据之前（即是否比数据更靠近相机）。
+ * @param {widget_t*} widget widget对象。
+ * @param {const plot3d_bounds_t*} bounds 包围盒。
+ * @param {const float_t*} origin 三个网格面各自所在的轴坐标值。
+ * @param {bool_t*} out_x 返回 yz 面（法线沿 X）是否挡在数据之前。
+ * @param {bool_t*} out_y 返回 xz 面（法线沿 Y）是否挡在数据之前。
+ * @param {bool_t*} out_z 返回 xy 面（法线沿 Z）是否挡在数据之前。
+ *
+ * @return {bool_t} 返回 TRUE 表示成功，否则表示失败。
+ */
+bool_t plot3d_grid_plane_faces_camera(widget_t* widget, const plot3d_bounds_t* bounds,
+                                       const float_t origin[3], bool_t* out_x, bool_t* out_y,
+                                       bool_t* out_z);
+
+/**
  * @method plot3d_update_projection_cache
  * 重建投影缓存，并清理越界 hover。
  * @annotation ["global"]

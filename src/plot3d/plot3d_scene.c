@@ -397,6 +397,36 @@ ret_t plot3d_calc_bounds(plot3d_t* plot3d, plot3d_bounds_t* bounds) {
                                   &(bounds->scale_z));
 }
 
+/* 摄像机视线方向（世界坐标单位向量） */
+static void plot3d_camera_view_dir(plot3d_t* plot3d, float_t dir[3]) {
+  float_t cy = cosf(plot3d->camera_yaw);
+  float_t sy = sinf(plot3d->camera_yaw);
+  float_t cp = cosf(plot3d->camera_pitch);
+  float_t sp = sinf(plot3d->camera_pitch);
+
+  dir[0] = sy * cp;
+  dir[1] = cy * cp;
+  dir[2] = -sp;
+}
+
+bool_t plot3d_grid_plane_faces_camera(widget_t* widget, const plot3d_bounds_t* bounds,
+                                       const float_t origin[3], bool_t* out_x, bool_t* out_y,
+                                       bool_t* out_z) {
+  plot3d_t* plot3d = PLOT3D(widget);
+  float_t dir[3];
+  return_value_if_fail(plot3d != NULL && bounds != NULL && origin != NULL &&
+                        out_x != NULL && out_y != NULL && out_z != NULL, FALSE);
+
+  plot3d_camera_view_dir(plot3d, dir);
+
+  /* dir 与 (center - origin) 同向，说明 origin 夹在 center 与摄像机之间 */
+  *out_x = dir[PLOT3D_AXIS_X] * (bounds->center_x - origin[PLOT3D_AXIS_X]) > 0;
+  *out_y = dir[PLOT3D_AXIS_Y] * (bounds->center_y - origin[PLOT3D_AXIS_Y]) > 0;
+  *out_z = dir[PLOT3D_AXIS_Z] * (bounds->center_z - origin[PLOT3D_AXIS_Z]) > 0;
+
+  return TRUE;
+}
+
 bool_t plot3d_project_world_point(widget_t* widget, const plot3d_bounds_t* bounds, float_t x,
                                    float_t y, float_t z, plot3d_projected_point_t* out) {
   plot3d_t* plot3d = PLOT3D(widget);

@@ -125,7 +125,8 @@ static ret_t plot3d_draw_world_line(widget_t* widget, vgcanvas_t* vg,
 /* 一个轴上的每个刻度都拉出两条网格线，分别贴在另外两个方向的网格面上。 */
 static ret_t plot3d_draw_grid_lines(widget_t* widget, vgcanvas_t* vg,
                                      const plot3d_bounds_t* bounds, plot3d_axis_t axis,
-                                     const float_t origin[3], color_t color) {
+                                     const float_t origin[3], const bool_t front[3], color_t color,
+                                     bool_t in_front_of_data) {
   uint32_t i = 0;
   uint32_t k = 0;
   plot3d_axis_range_t range;
@@ -144,6 +145,11 @@ static ret_t plot3d_draw_grid_lines(widget_t* widget, vgcanvas_t* vg,
 
       return_value_if_fail(plot3d_bounds_get_axis(bounds, along, &along_range) == RET_OK,
                            RET_BAD_PARAMS);
+
+      if (front[fixed] != in_front_of_data) {
+        continue;
+      }
+
       p0[axis] = p1[axis] = v;
       p0[fixed] = p1[fixed] = origin[fixed];
       p0[along] = along_range.min_v;
@@ -182,11 +188,16 @@ static ret_t plot3d_draw_axis_line(widget_t* widget, vgcanvas_t* vg,
   return RET_OK;
 }
 
-ret_t plot3d_draw_grid_and_axis(widget_t* widget, canvas_t* c, const plot3d_bounds_t* bounds) {
+/* in_front_of_data：
+ * TRUE  画挡在数据前面的网格（在 plot3d_draw_data 之后调用，压在数据上）；
+ * FALSE 画落在数据后面的网格（在 plot3d_draw_data 之前调用，被数据盖住）。 */
+ret_t plot3d_draw_grid_and_axis(widget_t* widget, canvas_t* c, const plot3d_bounds_t* bounds,
+                                 bool_t in_front_of_data) {
   plot3d_t* plot3d = PLOT3D(widget);
   vgcanvas_t* vg = canvas_get_vgcanvas(c);
   uint32_t i = 0;
   float_t origin[3];
+  bool_t front[3];
   color_t axis_colors[3];
   return_value_if_fail(plot3d != NULL && bounds != NULL, RET_BAD_PARAMS);
   return_value_if_fail(vg != NULL, RET_OK);
@@ -202,17 +213,29 @@ ret_t plot3d_draw_grid_and_axis(widget_t* widget, canvas_t* c, const plot3d_boun
       plot3d_axis_value_at_grid_index(bounds->min_z, bounds->max_z, bounds->count_z,
                                       plot3d->xy_grid_position);
 
+  return_value_if_fail(plot3d_grid_plane_faces_camera(widget, bounds, origin, &(front[0]),
+                                                       &(front[1]), &(front[2])), RET_FAIL);
+
   axis_colors[PLOT3D_AXIS_X] = plot3d->xaxis_color;
   axis_colors[PLOT3D_AXIS_Y] = plot3d->yaxis_color;
   axis_colors[PLOT3D_AXIS_Z] = plot3d->zaxis_color;
 
   if (plot3d->show_grid) {
     for (i = 0; i < ARRAY_SIZE(axis_colors); i++) {
-      plot3d_draw_grid_lines(widget, vg, bounds, (plot3d_axis_t)i, origin, plot3d->grid_color);
+      plot3d_draw_grid_lines(widget, vg, bounds, (plot3d_axis_t)i, origin, front,
+                              plot3d->grid_color, in_front_of_data);
     }
   }
 
   for (i = 0; i < ARRAY_SIZE(axis_colors); i++) {
+    plot3d_axis_t j = (plot3d_axis_t)((i + 1) % 3);
+    plot3d_axis_t k = (plot3d_axis_t)((i + 2) % 3);
+
+    /* 轴线在另外两个平面的交线上，只要有一个平面朝向相机，这条轴线就需要在数据之后绘制。 */
+    if ((front[j] || front[k]) != in_front_of_data) {
+      continue;
+    }
+
     plot3d_draw_axis_line(widget, vg, bounds, (plot3d_axis_t)i, origin, axis_colors[i],
                            plot3d->axis_negative_brightness);
   }

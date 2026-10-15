@@ -16,6 +16,7 @@ EXPORTS
     plot3d_colorizer_factory_get
     plot3d_colorizer_factory_deinit
     plot3d_colormap_get_color
+    plot3d_grid_plane_faces_camera
     plot3d_colorizer_expr_register
     plot3d_datatip_pick_nearest
     plot3d_datatip_update_hover

@@ -1736,8 +1736,10 @@ static ret_t plot3d_on_paint_self_impl(widget_t* widget, canvas_t* c) {
   plot3d_calc_bounds(plot3d, &bounds);
   plot3d_update_projection_cache(widget, &bounds);
   plot3d_rebuild_draw_cache(widget);
-  plot3d_draw_grid_and_axis(widget, c, &bounds);
+  /* 先画数据后面的网格，再画数据前面的网格。 */
+  plot3d_draw_grid_and_axis(widget, c, &bounds, FALSE);
   plot3d_draw_data(widget, c, &bounds);
+  plot3d_draw_grid_and_axis(widget, c, &bounds, TRUE);
   /* 文字最后画，保证压在网格线和数据图元之上。 */
   plot3d_draw_axis_text(widget, c, &bounds);
   plot3d_datatip_paint(widget, c);

@@ -296,6 +296,47 @@
           "type": "ret_t",
           "desc": "返回RET_OK表示成功，否则表示失败。"
         }
+      },
+      {
+        "params": [
+          {
+            "type": "widget_t*",
+            "name": "widget",
+            "desc": "widget对象。"
+          },
+          {
+            "type": "const plot3d_bounds_t*",
+            "name": "bounds",
+            "desc": "包围盒。"
+          },
+          {
+            "type": "const float_t*",
+            "name": "origin",
+            "desc": "三个网格面各自所在的轴坐标值。"
+          },
+          {
+            "type": "bool_t*",
+            "name": "out_x",
+            "desc": "返回 yz 面（法线沿 X）是否挡在数据之前。"
+          },
+          {
+            "type": "bool_t*",
+            "name": "out_y",
+            "desc": "返回 xz 面（法线沿 Y）是否挡在数据之前。"
+          },
+          {
+            "type": "bool_t*",
+            "name": "out_z",
+            "desc": "返回 xy 面（法线沿 Z）是否挡在数据之前。"
+          }
+        ],
+        "annotation": {},
+        "desc": "判断三个网格面是否挡在数据之前（即是否比数据更靠近相机）。",
+        "name": "plot3d_grid_plane_faces_camera",
+        "return": {
+          "type": "bool_t",
+          "desc": "返回 TRUE 表示成功，否则表示失败。"
+        }
       }
     ],
     "events": [],

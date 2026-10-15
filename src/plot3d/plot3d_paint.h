@@ -27,7 +27,8 @@
 
 BEGIN_C_DECLS
 
-ret_t plot3d_draw_grid_and_axis(widget_t* widget, canvas_t* c, const plot3d_bounds_t* bounds);
+ret_t plot3d_draw_grid_and_axis(widget_t* widget, canvas_t* c, const plot3d_bounds_t* bounds,
+                                 bool_t in_front_of_data);
 ret_t plot3d_draw_data(widget_t* widget, canvas_t* c, const plot3d_bounds_t* bounds);
 ret_t plot3d_draw_axis_text(widget_t* widget, canvas_t* c, const plot3d_bounds_t* bounds);
 

@@ -339,6 +339,129 @@ TEST(plot3d, axis_value_at_grid_index) {
   ASSERT_NEAR(3.0f, plot3d_axis_value_at_grid_index(-3.0f, 3.0f, 6, 99), 0.001f);
 }
 
+/* 网格面是否挡在数据之前，决定它画在数据图元之前还是之后，错判会让整面网格线被数据吞掉。 */
+TEST(plot3d, grid_plane_faces_camera) {
+  plot3d_bounds_t bounds;
+  widget_t* w = plot3d_create(NULL, 0, 0, 320, 240);
+  float_t origin_min[3] = {0, 0, 0};
+  float_t origin_max[3] = {0, 0, 0};
+  bool_t x = FALSE;
+  bool_t y = FALSE;
+  bool_t z = FALSE;
+  const float_t pi = 3.1415927f;
+
+  ASSERT_EQ(RET_OK, plot3d_calc_bounds(PLOT3D(w), &bounds));
+  origin_min[PLOT3D_AXIS_X] = bounds.min_x;
+  origin_min[PLOT3D_AXIS_Y] = bounds.min_y;
+  origin_min[PLOT3D_AXIS_Z] = bounds.min_z;
+  origin_max[PLOT3D_AXIS_X] = bounds.max_x;
+  origin_max[PLOT3D_AXIS_Y] = bounds.max_y;
+  origin_max[PLOT3D_AXIS_Z] = bounds.max_z;
+
+  /* 默认视角（yaw=-0.75, pitch=0.35）：相机在 +x/-y/上方，min 侧只有 yz 面夹在相机与数据之间 */
+  ASSERT_TRUE(plot3d_grid_plane_faces_camera(w, &bounds, origin_min, &x, &y, &z));
+  ASSERT_FALSE(x);
+  ASSERT_TRUE(y);
+  ASSERT_FALSE(z);
+  /* 改用 max 面：x/y/z 三个关系同时翻转 */
+  ASSERT_TRUE(plot3d_grid_plane_faces_camera(w, &bounds, origin_max, &x, &y, &z));
+  ASSERT_TRUE(x);
+  ASSERT_FALSE(y);
+  ASSERT_TRUE(z);
+
+  /* 转到对侧后竖直面对调，xy 面关系不变 */
+  ASSERT_EQ(RET_OK, plot3d_set_camera_yaw(w, -0.75f + pi));
+  ASSERT_TRUE(plot3d_grid_plane_faces_camera(w, &bounds, origin_min, &x, &y, &z));
+  ASSERT_TRUE(x);
+  ASSERT_FALSE(y);
+  ASSERT_FALSE(z);
+
+  /* 相机移到水平面下方，xy 面翻到数据之前 */
+  ASSERT_EQ(RET_OK, plot3d_set_camera_yaw(w, -0.75f));
+  ASSERT_EQ(RET_OK, plot3d_set_camera_pitch(w, -0.35f));
+  ASSERT_TRUE(plot3d_grid_plane_faces_camera(w, &bounds, origin_min, &x, &y, &z));
+  ASSERT_FALSE(x);
+  ASSERT_TRUE(y);
+  ASSERT_TRUE(z);
+
+  /* 网格面取到中心那一格时埋进数据里，永远算作不挡在之前 */
+  {
+    float_t origin_center[3] = {bounds.center_x, bounds.center_y, bounds.center_z};
+    ASSERT_TRUE(plot3d_grid_plane_faces_camera(w, &bounds, origin_center, &x, &y, &z));
+    ASSERT_FALSE(x);
+    ASSERT_FALSE(y);
+    ASSERT_FALSE(z);
+  }
+
+  widget_destroy(w);
+}
+
+/* 相机绕一圈、网格面挪一圈，判别式都必须与"视线方向 × (中心-网格面)"的符号一致。 */
+TEST(plot3d, grid_plane_faces_camera_sweep) {
+  widget_t* w = plot3d_create(NULL, 0, 0, 320, 240);
+  plot3d_t* plot3d = PLOT3D(w);
+  plot3d_bounds_t bounds;
+  float_t yaw = 0;
+  float_t pitch = 0;
+  uint32_t px = 0;
+  uint32_t py = 0;
+  uint32_t pz = 0;
+
+  ASSERT_EQ(RET_OK, plot3d_calc_bounds(plot3d, &bounds));
+
+  for (yaw = -3.2f; yaw <= 3.2f; yaw += 0.4f) {
+    for (pitch = -1.3f; pitch <= 1.3f; pitch += 0.35f) {
+      float_t sy = sinf(yaw);
+      float_t cy = cosf(yaw);
+      float_t sp = sinf(pitch);
+      float_t cp = cosf(pitch);
+      float_t dir[3] = {sy * cp, cy * cp, -sp};
+      float_t center[3] = {bounds.center_x, bounds.center_y, bounds.center_z};
+
+      plot3d->camera_yaw = yaw;
+      plot3d->camera_pitch = pitch;
+
+      for (px = 0; px <= 6; px += 2) {
+        for (py = 0; py <= 6; py += 2) {
+          for (pz = 0; pz <= 6; pz += 2) {
+            bool_t x = FALSE;
+            bool_t y = FALSE;
+            bool_t z = FALSE;
+            float_t origin[3];
+
+            origin[PLOT3D_AXIS_X] = plot3d_axis_value_at_grid_index(
+                bounds.min_x, bounds.max_x, bounds.count_x, px);
+            origin[PLOT3D_AXIS_Y] = plot3d_axis_value_at_grid_index(
+                bounds.min_y, bounds.max_y, bounds.count_y, py);
+            origin[PLOT3D_AXIS_Z] = plot3d_axis_value_at_grid_index(
+                bounds.min_z, bounds.max_z, bounds.count_z, pz);
+
+            ASSERT_TRUE(plot3d_grid_plane_faces_camera(w, &bounds, origin, &x, &y, &z));
+            ASSERT_EQ(x, dir[0] * (center[0] - origin[0]) > 0);
+            ASSERT_EQ(y, dir[1] * (center[1] - origin[1]) > 0);
+            ASSERT_EQ(z, dir[2] * (center[2] - origin[2]) > 0);
+          }
+        }
+      }
+    }
+  }
+
+  /* 过中心的网格面永远不算挡在数据之前。 */
+  {
+    float_t origin[3] = {bounds.center_x, bounds.center_y, bounds.center_z};
+    bool_t x = TRUE;
+    bool_t y = TRUE;
+    bool_t z = TRUE;
+
+    ASSERT_TRUE(plot3d_grid_plane_faces_camera(w, &bounds, origin, &x, &y, &z));
+    ASSERT_FALSE(x);
+    ASSERT_FALSE(y);
+    ASSERT_FALSE(z);
+  }
+
+  widget_destroy(w);
+}
+
 TEST(plot3d, grid_count_props) {
   value_t v;
   widget_t* w = plot3d_create(NULL, 0, 0, 320, 240);
