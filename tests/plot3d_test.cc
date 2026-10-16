@@ -44,12 +44,17 @@ static const plot3d_sample_spec_t s_sample_specs[] = {
     {"sample_bars", 29, 1, 5, 1, 5, 0, 8, 4, 4, 7.9f},
     {"sample_trefoil", 241, -3, 3, -3, 3, -1, 1, 5, 5, 1.9f}};
 
+/* 路径基于 APP_ROOT（SCons 注入的工程根目录）。 */
+#ifndef APP_ROOT
+#define APP_ROOT "."
+#endif
+
 /* 直接读设计目录下的源文件：它既是打包资源的输入，也是生成脚本的输出。 */
 static char* plot3d_test_read_sample(const char* name) {
   char path[MAX_PATH + 1];
   uint32_t size = 0;
 
-  tk_snprintf(path, sizeof(path), "design/default/data/%s.csv", name);
+  tk_snprintf(path, sizeof(path), APP_ROOT "/design/default/data/%s.csv", name);
 
   return (char*)file_read(path, &size);
 }
