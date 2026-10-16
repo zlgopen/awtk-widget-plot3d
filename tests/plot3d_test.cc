@@ -2,6 +2,8 @@
 
 #include "plot3d/plot3d.h"
 #include "plot3d/plot3d_scene.h"
+/* 事件路径的回归测试要直接调控件的 on_event，widget_vtable_on_event() 没有从 awtk.dll 导出。 */
+#include "base/widget_vtable.h"
 #include "gtest/gtest.h"
 #include "tkc/color_parser.h"
 #include "awtk.h"
@@ -458,6 +460,48 @@ TEST(plot3d, grid_plane_faces_camera_sweep) {
     ASSERT_FALSE(y);
     ASSERT_FALSE(z);
   }
+
+  widget_destroy(w);
+}
+
+/* 相机距离只有 plot3d_set_camera_distance() 一个钳位入口。曾经滚轮和手势自己写钳位，
+ * 下限取成 0.2，绕过了 setter 的 1.8：再近 zoom_factor 顶到上限不再放大，透视因子 k
+ * 却被钳死，画面扭曲、连线端点也跑偏。这里钉住所有入口的下界。 */
+TEST(plot3d, camera_distance_clamped_on_all_paths) {
+  widget_t* w = plot3d_create(NULL, 0, 0, 320, 240);
+  wheel_event_t wheel;
+  multi_gesture_event_t gesture;
+  float_t min_d = PLOT3D_MIN_CAMERA_DISTANCE;
+  float_t max_d = PLOT3D_MAX_CAMERA_DISTANCE;
+  uint32_t i = 0;
+
+  /* setter 本身，两端都钳住 */
+  ASSERT_EQ(RET_OK, plot3d_set_camera_distance(w, 0.0f));
+  ASSERT_NEAR(min_d, PLOT3D(w)->camera_distance, 0.001f);
+  ASSERT_EQ(RET_OK, plot3d_set_camera_distance(w, 999.0f));
+  ASSERT_NEAR(max_d, PLOT3D(w)->camera_distance, 0.001f);
+
+  /* 滚轮一路放大，距离必须停在 min_d 不再下降 */
+  ASSERT_EQ(RET_OK, plot3d_set_camera_distance(w, 4.5f));
+  for (i = 0; i < 20; i++) {
+    w->vt->on_event(w, wheel_event_init(&wheel, EVT_WHEEL, w, 12));
+    ASSERT_TRUE(PLOT3D(w)->camera_distance >= min_d - 0.001f);
+  }
+  ASSERT_NEAR(min_d, PLOT3D(w)->camera_distance, 0.001f);
+
+  /* 滚轮缩小同样不得越过上限 */
+  for (i = 0; i < 40; i++) {
+    w->vt->on_event(w, wheel_event_init(&wheel, EVT_WHEEL, w, -12));
+    ASSERT_TRUE(PLOT3D(w)->camera_distance <= max_d + 0.001f);
+  }
+
+  /* 触控手势放大，下界一致 */
+  ASSERT_EQ(RET_OK, plot3d_set_camera_distance(w, 2.0f));
+  for (i = 0; i < 20; i++) {
+    w->vt->on_event(w, multi_gesture_event_init(&gesture, w, 100, 100, 0.0f, 0.3f));
+    ASSERT_TRUE(PLOT3D(w)->camera_distance >= min_d - 0.001f);
+  }
+  ASSERT_NEAR(min_d, PLOT3D(w)->camera_distance, 0.001f);
 
   widget_destroy(w);
 }

@@ -1480,6 +1480,10 @@ uint32_t plot3d_get_resample_nr_for_test(widget_t* widget);
 #define PLOT3D_MAX_CURVE_STEPS 10000u
 #define PLOT3D_DEFAULT_CURVE_STEPS 200u
 
+/* 相机距离 camera_distance 的有效区间。 */
+#define PLOT3D_MIN_CAMERA_DISTANCE 1.8f
+#define PLOT3D_MAX_CAMERA_DISTANCE 12.0f
+
 #define WIDGET_TYPE_PLOT3D "plot3d"
 
 #define PLOT3D(widget) ((plot3d_t*)(plot3d_cast(WIDGET(widget))))

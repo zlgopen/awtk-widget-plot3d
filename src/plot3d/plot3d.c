@@ -1065,7 +1065,8 @@ ret_t plot3d_set_camera_pitch(widget_t* widget, float_t camera_pitch) {
 ret_t plot3d_set_camera_distance(widget_t* widget, float_t camera_distance) {
   plot3d_t* plot3d = PLOT3D(widget);
   return_value_if_fail(plot3d != NULL, RET_BAD_PARAMS);
-  plot3d->camera_distance = tk_min(tk_max(camera_distance, 1.8f), 12.0f);
+  plot3d->camera_distance =
+      tk_clamp(camera_distance, PLOT3D_MIN_CAMERA_DISTANCE, PLOT3D_MAX_CAMERA_DISTANCE);
   return plot3d_mark_cache_dirty(widget);
 }
 
@@ -1799,13 +1800,11 @@ static ret_t plot3d_on_event(widget_t* widget, event_t* e) {
     plot3d_datatip_clear_hover(widget);
   } else if (e->type == EVT_WHEEL) {
     wheel_event_t* evt = (wheel_event_t*)e;
-    plot3d->camera_distance = tk_max(0.2f, plot3d->camera_distance - evt->dy * 0.05f);
-    plot3d_mark_cache_dirty(widget);
+    plot3d_set_camera_distance(widget, plot3d->camera_distance - evt->dy * 0.05f);
     return RET_STOP;
   } else if (e->type == EVT_MULTI_GESTURE) {
     multi_gesture_event_t* evt = (multi_gesture_event_t*)e;
-    plot3d->camera_distance = tk_max(0.2f, plot3d->camera_distance * (1.0f - evt->distance));
-    plot3d_mark_cache_dirty(widget);
+    plot3d_set_camera_distance(widget, plot3d->camera_distance * (1.0f - evt->distance));
     return RET_STOP;
   } else if (e->type == EVT_RESIZE || e->type == EVT_MOVE_RESIZE) {
     plot3d_mark_cache_dirty(widget);
